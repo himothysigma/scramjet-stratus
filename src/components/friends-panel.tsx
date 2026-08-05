@@ -79,13 +79,13 @@ export function FriendsPanel() {
   return (
     <div className="h-[calc(100vh-3.5rem-2rem)] flex flex-col">
       <div className="h-11 shrink-0 px-4 flex items-center gap-2 border-b border-border">
-        <Users className="h-4 w-4 text-emerald-500" />
+        <Users className="h-4 w-4 text-pink-500" />
         <span className="font-semibold">Friends</span>
         <div className="flex-1" />
         <div className="flex gap-1">
           <Button variant={tab === "friends" ? "secondary" : "ghost"} size="sm" className="h-7 text-xs" onClick={() => setTab("friends")}>Friends</Button>
           <Button variant={tab === "requests" ? "secondary" : "ghost"} size="sm" className="h-7 text-xs relative" onClick={() => setTab("requests")}>
-            Requests {incoming.length > 0 && <span className="ml-1 bg-emerald-500 text-white text-[9px] px-1.5 rounded-full">{incoming.length}</span>}
+            Requests {incoming.length > 0 && <span className="ml-1 bg-pink-500 text-white text-[9px] px-1.5 rounded-full">{incoming.length}</span>}
           </Button>
           <Button variant={tab === "add" ? "secondary" : "ghost"} size="sm" className="h-7 text-xs" onClick={() => setTab("add")}><UserPlus className="h-3.5 w-3.5" /></Button>
         </div>
@@ -99,7 +99,7 @@ export function FriendsPanel() {
               <p className="text-xs text-muted-foreground mb-3">Enter their username to send a friend request.</p>
               <div className="flex gap-2">
                 <Input value={addUsername} onChange={(e) => setAddUsername(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendRequest()} placeholder="username" autoFocus />
-                <Button onClick={sendRequest} disabled={!addUsername.trim()} className="bg-emerald-500 hover:bg-emerald-600 text-white">Send</Button>
+                <Button onClick={sendRequest} disabled={!addUsername.trim()} className="bg-pink-500 hover:bg-pink-600 text-white">Send</Button>
               </div>
               {outgoing.length > 0 && (
                 <div className="mt-6">
@@ -121,7 +121,7 @@ export function FriendsPanel() {
                   <div key={u.id} className="flex items-center gap-2 py-2 border-b border-border last:border-0">
                     <AvatarWithDeco src={u.pfpUrl} name={u.displayName} role={u.role} avatarDeco={u.avatarDeco} size="sm" />
                     <div className="flex-1 min-w-0"><DisplayName name={u.displayName} role={u.role} className="text-sm" /><p className="text-xs text-muted-foreground">@{u.username}</p></div>
-                    <Button size="sm" className="h-7 bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => acceptReq(u.id)}><Check className="h-3.5 w-3.5" /></Button>
+                    <Button size="sm" className="h-7 bg-pink-500 hover:bg-pink-600 text-white" onClick={() => acceptReq(u.id)}><Check className="h-3.5 w-3.5" /></Button>
                     <Button size="sm" variant="ghost" className="h-7" onClick={() => declineReq(u.id)}><X className="h-3.5 w-3.5" /></Button>
                   </div>
                 ))
@@ -229,7 +229,7 @@ function DMConversation({ channelId, other, onBack }: { channelId: string; other
         <AvatarWithDeco src={other.pfpUrl} name={other.displayName} role={other.role} avatarDeco={other.avatarDeco} size="xs" />
         <DisplayName name={other.displayName} role={other.role} className="font-semibold" />
         <RoleBadge role={other.role} />
-        <span className={cn("ml-2 h-2 w-2 rounded-full", connected ? "bg-emerald-500" : "bg-red-500")} />
+        <span className={cn("ml-2 h-2 w-2 rounded-full", connected ? "bg-pink-500" : "bg-red-500")} />
       </div>
       <div ref={scrollRef} className="flex-1 overflow-y-auto custom-scroll px-4 py-4 space-y-3">
         {messages.length === 0 && <div className="h-full flex flex-col items-center justify-center text-muted-foreground"><MessageSquare className="h-8 w-8 mb-2 opacity-40" /><p className="text-sm">Start of your DM with {other.displayName}</p></div>}
@@ -242,7 +242,7 @@ function DMConversation({ channelId, other, onBack }: { channelId: string; other
               <div className={cn("max-w-[70%]", own && "text-right")}>
                 <p className="text-[10px] text-muted-foreground mb-0.5">{new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
                 {m.deleted ? <p className="text-xs italic text-muted-foreground">Message deleted</p> : (
-                  <p className={cn("text-sm rounded-lg px-3 py-1.5 inline-block", own ? "bg-emerald-500 text-white" : "bg-muted text-foreground")}>{m.content}</p>
+                  <p className={cn("text-sm rounded-lg px-3 py-1.5 inline-block", own ? "bg-pink-500 text-white" : "bg-muted text-foreground")}>{m.content}</p>
                 )}
               </div>
             </div>
@@ -252,7 +252,7 @@ function DMConversation({ channelId, other, onBack }: { channelId: string; other
       <div className="shrink-0 p-3 border-t border-border">
         <div className="flex gap-2">
           <Input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }} placeholder={`Message ${other.displayName}`} disabled={!connected} className="flex-1" />
-          <Button onClick={send} disabled={!connected || !draft.trim()} className="bg-emerald-500 hover:bg-emerald-600 text-white" size="icon" aria-label="Send"><Send className="h-4 w-4" /></Button>
+          <Button onClick={send} disabled={!connected || !draft.trim()} className="bg-pink-500 hover:bg-pink-600 text-white" size="icon" aria-label="Send"><Send className="h-4 w-4" /></Button>
         </div>
       </div>
     </div>

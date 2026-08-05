@@ -74,8 +74,8 @@ export function CloudGamingPanel() {
     <div className="h-[calc(100vh-3.5rem-2rem)] overflow-y-auto">
       <div className="p-5 sm:p-6 max-w-5xl mx-auto">
         <div className="flex items-center gap-3 mb-1">
-          <div className="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-            <Gamepad2 className="h-5 w-5 text-emerald-500" />
+          <div className="h-10 w-10 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center">
+            <Gamepad2 className="h-5 w-5 text-pink-500" />
           </div>
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Cloud Gaming</h1>
@@ -94,7 +94,7 @@ export function CloudGamingPanel() {
             <button
               key={g.id}
               onClick={() => setActive(g)}
-              className="group text-left rounded-xl border border-border bg-card hover:border-emerald-500/40 hover:shadow-lg transition-all overflow-hidden"
+              className="group text-left rounded-xl border border-border bg-card hover:border-pink-500/40 hover:shadow-lg transition-all overflow-hidden"
             >
               <div className="aspect-[16/10] relative overflow-hidden bg-muted">
                 <img

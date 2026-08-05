@@ -89,7 +89,7 @@ export function SettingsPanel() {
         {/* Owner verification */}
         <section className="rounded-xl border border-border p-4">
           <div className="flex items-center gap-2 mb-1">
-            <KeyRound className="h-4 w-4 text-emerald-500" />
+            <KeyRound className="h-4 w-4 text-pink-500" />
             <h2 className="text-sm font-semibold">Verify ownership</h2>
           </div>
           <p className="text-xs text-muted-foreground mb-4">Enter the owner password to unlock the Owner role. Owners get golden glowing names, all permissions, GIF uploads, avatar decorations, and profile effects.</p>
@@ -103,7 +103,7 @@ export function SettingsPanel() {
                 <Label htmlFor="ownerPass">Owner password</Label>
                 <Input id="ownerPass" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter owner password" autoComplete="off" />
               </div>
-              <Button type="submit" disabled={!password || verifying} className="bg-emerald-500 hover:bg-emerald-600 text-white">
+              <Button type="submit" disabled={!password || verifying} className="bg-pink-500 hover:bg-pink-600 text-white">
                 {verifying ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}Verify ownership
               </Button>
             </form>
@@ -114,7 +114,7 @@ export function SettingsPanel() {
         {user.role === "OWNER" && (
           <section className="rounded-xl border border-border p-4">
             <div className="flex items-center gap-2 mb-3">
-              <Users className="h-4 w-4 text-emerald-500" />
+              <Users className="h-4 w-4 text-pink-500" />
               <h2 className="text-sm font-semibold">User Management</h2>
             </div>
             <p className="text-xs text-muted-foreground mb-3">Assign roles (admin/mod) and mute users. Owner has all permissions.</p>

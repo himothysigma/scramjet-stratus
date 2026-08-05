@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   ArrowLeft, ArrowRight, RotateCw, Globe, ExternalLink, Lock, Home,
-  Star, StarOff, Shield, ShieldOff, X, Clock, Search,
+  Star, StarOff, Shield, ShieldOff, X, Clock, Search, Zap, ZapOff,
 } from "lucide-react"
 import { QUICK_LINKS, SEARCH_ENGINES } from "@/lib/client-constants"
 import { useBrowser, searchEngine } from "@/hooks/use-browser"
@@ -13,6 +13,24 @@ import {
   Popover, PopoverContent, PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+
+// Ultraviolet XOR URL encoder — mirrors uv.config.js codec
+// Used ONLY for raccoon cloud games (per user request). Scramjet is the main/default proxy.
+function uvEncode(url: string): string {
+  const codec = (typeof window !== "undefined" && (window as any).__uv$config?.encodeUrl) || null
+  if (codec) return codec(url)
+  // Fallback: inline XOR codec (must match Ultraviolet.codec.xor)
+  const key = "uv"
+  let result = ""
+  for (let i = 0; i < url.length; i++) {
+    result += String.fromCharCode(url.charCodeAt(i) ^ key.charCodeAt(i % key.length))
+  }
+  return encodeURIComponent(result)
+}
+
+function isHttps(): boolean {
+  return typeof window !== "undefined" && (window.location.protocol === "https:" || window.location.hostname === "localhost")
+}
 
 type Tab = { id: string; url: string | null; input: string; title: string }
 
@@ -33,7 +51,8 @@ function normalizeUrl(raw: string, engineId: string): string {
 export function BrowserPanel() {
   const {
     searchEngineId, setSearchEngine, homepage, setHomepage,
-    useProxy, setUseProxy, bookmarks, addBookmark, removeBookmark,
+    useProxy, setUseProxy, useUltraviolet, setUseUltraviolet,
+    bookmarks, addBookmark, removeBookmark,
     isBookmarked, recordVisit, history, clearHistory, removeHistory,
   } = useBrowser()
 
@@ -41,7 +60,43 @@ export function BrowserPanel() {
   const [activeId, setActiveId] = useState(tabs[0].id)
   const [loading, setLoading] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
+  const [uvReady, setUvReady] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  // Register Ultraviolet service worker — ONLY on HTTPS (SWs require secure context).
+  // Loads uv.bundle.js + uv.config.js, then registers uv.sw.js.
+  useEffect(() => {
+    if (!isHttps()) return // SW won't register on HTTP (sandbox gateway). Works on Replit (HTTPS).
+    let cancelled = false
+    const loadScripts = async () => {
+      // Load the UV bundle + config scripts
+      await new Promise<void>((resolve, reject) => {
+        const s = document.createElement("script")
+        s.src = "/uv/uv.bundle.js"
+        s.onload = () => resolve()
+        s.onerror = () => reject(new Error("bundle load failed"))
+        document.head.appendChild(s)
+      })
+      await new Promise<void>((resolve, reject) => {
+        const s = document.createElement("script")
+        s.src = "/uv/uv.config.js"
+        s.onload = () => resolve()
+        s.onerror = () => reject(new Error("config load failed"))
+        document.head.appendChild(s)
+      })
+      // Register the service worker (must be at /service/ for scope /service/)
+      if (cancelled) return
+      try {
+        await navigator.serviceWorker.register("/service/uv.sw.js", { scope: "/service/" })
+        await navigator.serviceWorker.ready
+        if (!cancelled) setUvReady(true)
+      } catch (e) {
+        console.error("[uv] SW registration failed:", e)
+      }
+    }
+    loadScripts()
+    return () => { cancelled = true }
+  }, [])
 
   const active = tabs.find((t) => t.id === activeId) || tabs[0]
 
@@ -53,7 +108,12 @@ export function BrowserPanel() {
     if (!url) return
     let displayUrl = url
     let loadSrc = url
-    if (useProxy) {
+    if (useUltraviolet) {
+      // Ultraviolet mode (SW intercept — for raccoon games). Requires HTTPS.
+      // The SW intercepts all fetch/XHR/WebSocket under /service/
+      displayUrl = `/service/${uvEncode(url)}`
+      loadSrc = displayUrl
+    } else if (useProxy) {
       displayUrl = `/api/proxy?url=${encodeURIComponent(url)}`
       loadSrc = displayUrl
     }
@@ -162,15 +222,30 @@ export function BrowserPanel() {
             ))}
           </PopoverContent>
         </Popover>
-        {/* Proxy toggle */}
+        {/* Proxy toggle (Scramjet — main/default) */}
         <Button
           variant="ghost" size="sm"
           className="h-7 gap-1.5 text-xs"
-          onClick={() => setUseProxy(!useProxy)}
-          title={useProxy ? "Proxy ON — bypasses anti-iframe blocks" : "Proxy OFF — direct iframe"}
+          onClick={() => { setUseProxy(!useProxy); if (useUltraviolet) setUseUltraviolet(false) }}
+          title={useProxy ? "Scramjet proxy ON — bypasses anti-iframe blocks" : "Scramjet proxy OFF — direct iframe"}
         >
           {useProxy ? <Shield className="h-3.5 w-3.5 synnical-accent" /> : <ShieldOff className="h-3.5 w-3.5 text-muted-foreground" />}
-          {useProxy ? "Proxy" : "Direct"}
+          {useProxy ? "Scramjet" : "Direct"}
+        </Button>
+
+        {/* Ultraviolet toggle — ONLY for raccoon cloud games. Requires HTTPS. */}
+        <Button
+          variant="ghost" size="sm"
+          className="h-7 gap-1.5 text-xs"
+          onClick={() => {
+            if (!isHttps()) { alert("Ultraviolet requires HTTPS. It works on Replit (https) but not in the HTTP sandbox preview. Deploy to Replit to use it for raccoon games."); return }
+            if (!uvReady) { alert("Ultraviolet service worker is still loading. Wait a moment and try again."); return }
+            setUseUltraviolet(!useUltraviolet); if (useProxy) setUseProxy(false)
+          }}
+          title={useUltraviolet ? "Ultraviolet ON — SW intercepts fetch/XHR/WebSocket (for raccoon games)" : "Ultraviolet OFF — enable for raccoon cloud games"}
+        >
+          {useUltraviolet ? <Zap className="h-3.5 w-3.5 synnical-accent" /> : <ZapOff className="h-3.5 w-3.5 text-muted-foreground" />}
+          UV
         </Button>
       </div>
 

@@ -96,7 +96,7 @@ export function ImageCropper({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <CropIcon className="h-4 w-4 text-emerald-500" />
+            <CropIcon className="h-4 w-4 text-pink-500" />
             {title}
           </DialogTitle>
         </DialogHeader>
@@ -118,7 +118,7 @@ export function ImageCropper({
           <Button variant="ghost" onClick={onCancel} disabled={busy}>
             Cancel
           </Button>
-          <Button onClick={confirm} disabled={busy || !completed} className="bg-emerald-500 hover:bg-emerald-600 text-white">
+          <Button onClick={confirm} disabled={busy || !completed} className="bg-pink-500 hover:bg-pink-600 text-white">
             {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Crop & Save
           </Button>

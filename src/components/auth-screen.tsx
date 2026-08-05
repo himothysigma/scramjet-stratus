@@ -35,8 +35,8 @@ export function AuthScreen() {
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <div className="flex flex-col items-center mb-8">
-            <div className="h-14 w-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">
-              <Cloud className="h-7 w-7 text-emerald-500" />
+            <div className="h-14 w-14 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-3">
+              <Cloud className="h-7 w-7 text-pink-500" />
             </div>
             <h1 className="text-2xl font-semibold tracking-tight">Stratus</h1>
             <p className="text-sm text-muted-foreground mt-1">Cloud gaming, chat & browser</p>
@@ -68,7 +68,7 @@ export function AuthScreen() {
               />
             </div>
 
-            <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-white" disabled={busy}>
+            <Button type="submit" className="w-full bg-pink-500 hover:bg-pink-600 text-white" disabled={busy}>
               {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {mode === "login" ? "Log in" : "Create account"}
             </Button>
@@ -79,7 +79,7 @@ export function AuthScreen() {
             <button
               type="button"
               onClick={() => setMode(mode === "login" ? "register" : "login")}
-              className="text-emerald-500 hover:text-emerald-400 font-medium"
+              className="text-pink-500 hover:text-pink-400 font-medium"
             >
               {mode === "login" ? "Register" : "Log in"}
             </button>

@@ -114,7 +114,7 @@ export function ProfilePanel() {
       <div className="max-w-2xl mx-auto p-4 sm:p-6 relative z-10">
         {/* Banner */}
         <div className="relative rounded-xl overflow-hidden border border-border bg-muted/40 group">
-          <div className="h-40 sm:h-48 w-full bg-gradient-to-br from-emerald-500/20 via-background to-background">
+          <div className="h-40 sm:h-48 w-full bg-gradient-to-br from-pink-500/20 via-background to-background">
             {user.bannerUrl && <img src={user.bannerUrl} alt="Banner" className={user.bannerIsGif ? "w-full h-full object-cover" : "w-full h-full object-cover"} />}
           </div>
           <button onClick={() => bannerInput.current?.click()} disabled={uploading === "banner"} className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md bg-background/90 backdrop-blur border border-border hover:bg-background disabled:opacity-50">
@@ -162,7 +162,7 @@ export function ProfilePanel() {
             </div>
           </div>
           <div className="flex justify-end">
-            <Button onClick={saveProfile} disabled={!dirty || saving} className="bg-emerald-500 hover:bg-emerald-600 text-white">
+            <Button onClick={saveProfile} disabled={!dirty || saving} className="bg-pink-500 hover:bg-pink-600 text-white">
               {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : dirty ? <Check className="mr-2 h-4 w-4" /> : null}
               Save changes
             </Button>

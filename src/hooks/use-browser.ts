@@ -10,12 +10,14 @@ export type HistoryEntry = { id: string; title: string; url: string; visitedAt: 
 type BrowserState = {
   searchEngineId: string
   homepage: string
-  useProxy: boolean
+  useProxy: boolean          // Scramjet (HTML rewrite) — main/default
+  useUltraviolet: boolean    // UV (SW intercept) — ONLY for raccoon games
   bookmarks: Bookmark[]
   history: HistoryEntry[]
   setSearchEngine: (id: string) => void
   setHomepage: (url: string) => void
   setUseProxy: (v: boolean) => void
+  setUseUltraviolet: (v: boolean) => void
   addBookmark: (b: Omit<Bookmark, "id" | "createdAt">) => void
   removeBookmark: (id: string) => void
   isBookmarked: (url: string) => boolean
@@ -30,11 +32,13 @@ export const useBrowser = create<BrowserState>()(
       searchEngineId: "duckduckgo",
       homepage: "",
       useProxy: true,
+      useUltraviolet: false,
       bookmarks: [],
       history: [],
       setSearchEngine: (id) => set({ searchEngineId: id }),
       setHomepage: (url) => set({ homepage: url }),
       setUseProxy: (v) => set({ useProxy: v }),
+      setUseUltraviolet: (v) => set({ useUltraviolet: v }),
       addBookmark: (b) =>
         set((s) => {
           if (s.bookmarks.some((x) => x.url === b.url)) return s
