@@ -7,17 +7,19 @@ import { CloudGamingPanel } from "@/components/cloud-gaming-panel"
 import { BrowserPanel } from "@/components/browser-panel"
 import { ProfilePanel } from "@/components/profile-panel"
 import { SettingsPanel } from "@/components/settings-panel"
-import { MessageSquare, Gamepad2, Globe, User, Settings } from "lucide-react"
+import { FriendsPanel } from "@/components/friends-panel"
+import { MessageSquare, Gamepad2, Globe, User, Settings, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useGaming } from "@/hooks/use-gaming"
 import { REGIONS } from "@/lib/client-constants"
 
-export type Panel = "chat" | "cloud-gaming" | "browser" | "profile" | "settings"
+export type Panel = "chat" | "cloud-gaming" | "browser" | "friends" | "profile" | "settings"
 
 const NAV: { id: Panel; label: string; icon: typeof MessageSquare }[] = [
   { id: "chat", label: "Chat", icon: MessageSquare },
-  { id: "cloud-gaming", label: "Cloud Gaming", icon: Gamepad2 },
-  { id: "browser", label: "Browser", icon: Globe },
+  { id: "friends", label: "Friends", icon: Users },
+  { id: "cloud-gaming", label: "Gaming", icon: Gamepad2 },
+  { id: "browser", label: "Synnical", icon: Globe },
   { id: "profile", label: "Profile", icon: User },
   { id: "settings", label: "Settings", icon: Settings },
 ]
@@ -61,6 +63,7 @@ export function AppShell() {
         {/* Panel content */}
         <main className="flex-1 min-w-0 min-h-0">
           {panel === "chat" && <ChatPanel />}
+          {panel === "friends" && <FriendsPanel />}
           {panel === "cloud-gaming" && <CloudGamingPanel />}
           {panel === "browser" && <BrowserPanel />}
           {panel === "profile" && <ProfilePanel />}

@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { useGaming } from "@/hooks/use-gaming"
 import { REGIONS, QUALITY_LEVELS } from "@/lib/client-constants"
 import type { Panel } from "@/components/app-shell"
+import { DisplayName } from "@/components/role-ui"
 
 export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) => void }) {
   const { user } = useAuth()
@@ -107,10 +108,8 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
               {user.displayName.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm font-medium max-w-[100px] truncate hidden sm:block">
-            {user.displayName}
-          </span>
-          {user.isOwner && <Crown className="h-3.5 w-3.5 text-amber-500 hidden sm:block" />}
+          <DisplayName name={user.displayName} role={user.role} className="text-sm font-medium max-w-[100px] truncate hidden sm:block" />
+          {user.role === "OWNER" && <Crown className="h-3.5 w-3.5 text-amber-500 hidden sm:block" />}
         </button>
       </div>
     </header>

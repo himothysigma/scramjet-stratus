@@ -1,4 +1,4 @@
-// Scramjet Stratus — real, functional schema
+// Scramjet Stratus — schema with roles, DMs, friends, profile effects, moderation
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,15 +14,24 @@ model User {
   passwordHash  String
   displayName   String
   bio           String    @default("")
+  status        String    @default("")
   pfpUrl        String?
   bannerUrl     String?
-  isOwner       Boolean   @default(false)
+  pfpIsGif      Boolean   @default(false)
+  bannerIsGif   Boolean   @default(false)
+  avatarDeco    String?
+  profileEffect String?
+  role          String    @default("MEMBER")
+  muted         Boolean   @default(false)
+  mutedUntil    DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  sessions      Session[]
-  messages      Message[]
-  memberships   Membership[]
+  sessions         Session[]
+  messages         Message[]
+  memberships      Membership[]
+  sentRequests     Friendship[] @relation("FriendRequester")
+  receivedRequests Friendship[] @relation("FriendReceiver")
 }
 
 model Session {
@@ -39,6 +48,7 @@ model Session {
 model Channel {
   id        String    @id @default(cuid())
   name      String    @unique
+  isDM      Boolean   @default(false)
   createdAt DateTime  @default(now())
 
   messages    Message[]
@@ -53,6 +63,7 @@ model Message {
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   username  String
   content   String
+  deleted   Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([channelId, createdAt])
@@ -67,4 +78,17 @@ model Membership {
   createdAt DateTime @default(now())
 
   @@unique([userId, channelId])
+}
+
+model Friendship {
+  id          String   @id @default(cuid())
+  requesterId String
+  receiverId String
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  requester   User     @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("FriendReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, receiverId])
+  @@index([receiverId, status])
 }

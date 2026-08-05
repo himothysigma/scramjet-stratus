@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { getCurrentUser } from "@/lib/auth"
+import { getCurrentUser, toSafeUser, isOwner } from "@/lib/auth"
 
 // PATCH /api/profile/update — update display name + bio
 export async function PATCH(req: NextRequest) {
@@ -11,8 +11,10 @@ export async function PATCH(req: NextRequest) {
   const data: { displayName?: string; bio?: string } = {}
   if (typeof displayName === "string") {
     const d = displayName.trim()
-    if (d.length < 1 || d.length > 32) {
-      return NextResponse.json({ error: "Display name 1-32 chars" }, { status: 400 })
+    // Owner can have a 1-letter display name; others need 1-32
+    const minLen = isOwner(user.role) ? 1 : 1
+    if (d.length < minLen || d.length > 32) {
+      return NextResponse.json({ error: "Display name must be 1-32 chars" }, { status: 400 })
     }
     data.displayName = d
   }
@@ -24,15 +26,5 @@ export async function PATCH(req: NextRequest) {
   }
 
   const updated = await db.user.update({ where: { id: user.id }, data })
-  return NextResponse.json({
-    user: {
-      id: updated.id,
-      username: updated.username,
-      displayName: updated.displayName,
-      bio: updated.bio,
-      pfpUrl: updated.pfpUrl,
-      bannerUrl: updated.bannerUrl,
-      isOwner: updated.isOwner,
-    },
-  })
+  return NextResponse.json({ user: toSafeUser(updated) })
 }

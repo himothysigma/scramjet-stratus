@@ -1,6 +1,5 @@
 // Scramjet Stratus — real-time chat service (socket.io)
-// Runs on port 3001. Uses bun:sqlite to read/write the same DB as the Next.js app.
-// Messages are persisted AND broadcast to every connected client across all devices.
+// Roles, DMs, mute enforcement, message deletion broadcast.
 
 import { createServer } from "http"
 import { Server } from "socket.io"
@@ -13,84 +12,7 @@ const sqlite = new Database(DB_PATH)
 sqlite.exec("PRAGMA journal_mode = WAL;")
 sqlite.exec("PRAGMA foreign_keys = ON;")
 
-// Prepared statements
-const getSession = sqlite.prepare(`
-  SELECT s.token, s.expiresAt, u.id as userId, u.username, u.displayName, u.pfpUrl, u.isOwner
-  FROM Session s JOIN User u ON u.id = s.userId
-  WHERE s.token = ?
-`)
-const insertMessage = sqlite.prepare(`
-  INSERT INTO Message (id, channelId, userId, username, content, createdAt)
-  VALUES (?, ?, ?, ?, ?, ?)
-`)
-const getChannelMessages = sqlite.prepare(`
-  SELECT id, channelId, userId, username, content, createdAt
-  FROM Message WHERE channelId = ? ORDER BY createdAt DESC LIMIT ?
-`)
-
-interface SessionRow {
-  token: string
-  expiresAt: string
-  userId: string
-  username: string
-  displayName: string
-  pfpUrl: string | null
-  isOwner: number
-}
-
-interface ClientUser {
-  userId: string
-  username: string
-  displayName: string
-  pfpUrl: string | null
-  isOwner: boolean
-}
-
-function genId(): string {
-  return crypto.randomUUID()
-}
-
-function safeUser(row: SessionRow): ClientUser {
-  return {
-    userId: row.userId,
-    username: row.username,
-    displayName: row.displayName,
-    pfpUrl: row.pfpUrl,
-    isOwner: row.isOwner === 1,
-  }
-}
-
-// socket.io server. Path MUST be "/" so Caddy forwards correctly.
-const httpServer = createServer()
-const io = new Server(httpServer, {
-  path: "/",
-  cors: { origin: "*", methods: ["GET", "POST"] },
-  pingTimeout: 60000,
-  pingInterval: 25000,
-})
-
-// Online users keyed by socket.id
-const online = new Map<string, ClientUser>()
-// channel -> Set of socket ids
-const channelRooms = new Map<string, Set<string>>()
-
-function broadcastPresence(channelId: string) {
-  const ids = channelRooms.get(channelId)
-  if (!ids) return
-  const users: ClientUser[] = []
-  const seen = new Set<string>()
-  for (const sid of ids) {
-    const u = online.get(sid)
-    if (u && !seen.has(u.userId)) {
-      seen.add(u.userId)
-      users.push(u)
-    }
-  }
-  io.to(`channel:${channelId}`).emit("presence", { channelId, users })
-}
-
 const SESSION_COOKIE = "stratus_session"
-
 function readCookie(cookieHeader: string | undefined): string | null {
   if (!cookieHeader) return null
   for (const part of cookieHeader.split(";")) {
@@ -100,20 +22,107 @@ function readCookie(cookieHeader: string | undefined): string | null {
   return null
 }
 
+const getSession = sqlite.prepare(`
+  SELECT s.token, s.expiresAt, u.id as userId, u.username, u.displayName, u.pfpUrl, u.pfpIsGif,
+         u.bio, u.status, u.avatarDeco, u.profileEffect, u.role, u.muted, u.mutedUntil
+  FROM Session s JOIN User u ON u.id = s.userId
+  WHERE s.token = ?
+`)
+const insertMessage = sqlite.prepare(`
+  INSERT INTO Message (id, channelId, userId, username, content, createdAt)
+  VALUES (?, ?, ?, ?, ?, ?)
+`)
+const getChannelMessages = sqlite.prepare(`
+  SELECT m.id, m.channelId, m.userId, m.username, m.content, m.deleted, m.createdAt,
+         u.displayName, u.pfpUrl, u.pfpIsGif, u.role
+  FROM Message m LEFT JOIN User u ON u.id = m.userId
+  WHERE m.channelId = ? ORDER BY m.createdAt DESC LIMIT ?
+`)
+const getChannel = sqlite.prepare(`SELECT id, name, isDM FROM Channel WHERE id = ?`)
+const getDMMembers = sqlite.prepare(`SELECT userId FROM Membership WHERE channelId = ?`)
+const getUserMute = sqlite.prepare(`SELECT muted, mutedUntil FROM User WHERE id = ?`)
+const markMessageDeleted = sqlite.prepare(`UPDATE Message SET deleted = 1, content = '' WHERE id = ?`)
+
+interface SessionRow {
+  token: string
+  expiresAt: string
+  userId: string
+  username: string
+  displayName: string
+  pfpUrl: string | null
+  pfpIsGif: number
+  bio: string
+  status: string
+  avatarDeco: string | null
+  profileEffect: string | null
+  role: string
+  muted: number
+  mutedUntil: string | null
+}
+
+interface ClientUser {
+  userId: string
+  username: string
+  displayName: string
+  pfpUrl: string | null
+  pfpIsGif: boolean
+  bio: string
+  status: string
+  avatarDeco: string | null
+  profileEffect: string | null
+  role: string
+  muted: boolean
+  mutedUntil: string | null
+}
+
+function safeUser(r: SessionRow): ClientUser {
+  return {
+    userId: r.userId, username: r.username, displayName: r.displayName,
+    pfpUrl: r.pfpUrl, pfpIsGif: r.pfpIsGif === 1, bio: r.bio, status: r.status,
+    avatarDeco: r.avatarDeco, profileEffect: r.profileEffect, role: r.role,
+    muted: r.muted === 1, mutedUntil: r.mutedUntil,
+  }
+}
+
+function isMutedNow(u: ClientUser): boolean {
+  if (!u.muted) return false
+  if (!u.mutedUntil) return true
+  return new Date(u.mutedUntil).getTime() > Date.now()
+}
+
+function genId() { return crypto.randomUUID() }
+
+const httpServer = createServer()
+const io = new Server(httpServer, {
+  path: "/",
+  cors: { origin: "*", methods: ["GET", "POST"] },
+  pingTimeout: 60000,
+  pingInterval: 25000,
+})
+
+const online = new Map<string, ClientUser>()
+const channelRooms = new Map<string, Set<string>>()
+
+function broadcastPresence(channelId: string) {
+  const ids = channelRooms.get(channelId)
+  if (!ids) return
+  const users: ClientUser[] = []
+  const seen = new Set<string>()
+  for (const sid of ids) {
+    const u = online.get(sid)
+    if (u && !seen.has(u.userId)) { seen.add(u.userId); users.push(u) }
+  }
+  io.to(`channel:${channelId}`).emit("presence", { channelId, users })
+}
+
 io.use((socket, next) => {
-  // Authenticate via the session cookie (sent automatically by the browser).
-  // Falls back to an auth token if provided.
   const token =
     (typeof socket.handshake.auth?.token === "string" && socket.handshake.auth.token) ||
     readCookie(socket.handshake.headers.cookie)
-  if (!token) {
-    return next(new Error("No token"))
-  }
+  if (!token) return next(new Error("No token"))
   const row = getSession.get(token) as SessionRow | null
   if (!row) return next(new Error("Invalid session"))
-  if (new Date(row.expiresAt).getTime() < Date.now()) {
-    return next(new Error("Session expired"))
-  }
+  if (new Date(row.expiresAt).getTime() < Date.now()) return next(new Error("Session expired"))
   ;(socket as any).user = safeUser(row)
   next()
 })
@@ -121,26 +130,26 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
   const user = (socket as any).user as ClientUser
   online.set(socket.id, user)
-  console.log(`[chat] connected: ${user.username} (${socket.id})`)
 
-  // Join a channel room + send recent history + presence
   socket.on("join-channel", ({ channelId }: { channelId: string }) => {
     if (!channelId) return
+    // For DM channels, verify membership
+    const ch = getChannel.get(channelId) as { id: string; name: string; isDM: number } | null
+    if (ch && ch.isDM === 1) {
+      const members = getDMMembers.all(channelId) as { userId: string }[]
+      if (!members.some((m) => m.userId === user.userId)) return
+    }
     socket.join(`channel:${channelId}`)
     if (!channelRooms.has(channelId)) channelRooms.set(channelId, new Set())
     channelRooms.get(channelId)!.add(socket.id)
 
-    // Send last 50 messages as history.
     const rows = getChannelMessages.all(channelId, 50) as any[]
     socket.emit("message-history", {
       channelId,
       messages: rows.reverse().map((r) => ({
-        id: r.id,
-        channelId: r.channelId,
-        userId: r.userId,
-        username: r.username,
-        content: r.content,
-        createdAt: r.createdAt,
+        id: r.id, channelId: r.channelId, userId: r.userId, username: r.username,
+        content: r.content, deleted: r.deleted === 1, createdAt: r.createdAt,
+        displayName: r.displayName, pfpUrl: r.pfpUrl, pfpIsGif: r.pfpIsGif === 1, role: r.role,
       })),
     })
     broadcastPresence(channelId)
@@ -152,9 +161,18 @@ io.on("connection", (socket) => {
     broadcastPresence(channelId)
   })
 
-  // Send a message — persisted then broadcast to everyone in the channel.
   socket.on("send-message", ({ channelId, content }: { channelId: string; content: string }) => {
     if (!channelId) return
+    // Re-check mute from DB (in case it changed since connect)
+    const fresh = getUserMute.get(user.userId) as { muted: number; mutedUntil: string | null } | null
+    if (fresh) {
+      user.muted = fresh.muted === 1
+      user.mutedUntil = fresh.mutedUntil
+    }
+    if (isMutedNow(user)) {
+      socket.emit("mute-error", { message: "You are muted and can't send messages." })
+      return
+    }
     const text = typeof content === "string" ? content.trim() : ""
     if (text.length === 0 || text.length > 2000) return
 
@@ -162,28 +180,25 @@ io.on("connection", (socket) => {
     const createdAt = new Date().toISOString()
     insertMessage.run(id, channelId, user.userId, user.username, text, createdAt)
 
-    const msg = {
-      id,
-      channelId,
-      userId: user.userId,
-      username: user.username,
-      displayName: user.displayName,
-      pfpUrl: user.pfpUrl,
-      content: text,
-      createdAt,
-    }
-    // Broadcast to EVERYONE in the channel (including sender for confirmation).
-    io.to(`channel:${channelId}`).emit("message", msg)
+    io.to(`channel:${channelId}`).emit("message", {
+      id, channelId, userId: user.userId, username: user.username,
+      displayName: user.displayName, pfpUrl: user.pfpUrl, pfpIsGif: user.pfpIsGif,
+      role: user.role, content: text, deleted: false, createdAt,
+    })
+  })
+
+  // Owner deletes a message — broadcast to the channel
+  socket.on("delete-message", ({ messageId, channelId }: { messageId: string; channelId: string }) => {
+    if (user.role !== "OWNER") return
+    markMessageDeleted.run(messageId)
+    io.to(`channel:${channelId}`).emit("message-deleted", { id: messageId, channelId })
   })
 
   socket.on("disconnect", () => {
     online.delete(socket.id)
     for (const [channelId, ids] of channelRooms.entries()) {
-      if (ids.delete(socket.id)) {
-        broadcastPresence(channelId)
-      }
+      if (ids.delete(socket.id)) broadcastPresence(channelId)
     }
-    console.log(`[chat] disconnected: ${user.username} (${socket.id})`)
   })
 })
 

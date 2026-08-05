@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { hashPassword, createSession, toSafeUser } from "@/lib/auth"
-import { OWNER_PASSWORD } from "@/lib/constants"
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,14 +20,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Username already taken" }, { status: 409 })
     }
 
-    // If the password equals the owner password, this account becomes the owner.
-    const isOwner = password === OWNER_PASSWORD
+    // Owner is NEVER granted by default — only via Settings → Verify ownership.
     const user = await db.user.create({
       data: {
         username: u.toLowerCase(),
         displayName: u,
         passwordHash: hashPassword(password),
-        isOwner,
+        role: "MEMBER",
       },
     })
     await createSession(user.id)

@@ -114,16 +114,16 @@ export function BrowserPanel() {
   const bookmarked = active.input ? isBookmarked(active.input) : false
 
   return (
-    <div className="h-[calc(100vh-3.5rem-2rem)] flex flex-col bg-background">
+    <div className="h-[calc(100vh-3.5rem-2rem)] flex flex-col synnical-bg">
       {/* Tab strip */}
-      <div className="h-9 shrink-0 flex items-center gap-1 px-2 border-b border-border bg-muted/30 overflow-x-auto">
+      <div className="h-9 shrink-0 flex items-center gap-1 px-2 border-b border-[#2a2a2a] bg-[#0d0d0d] overflow-x-auto">
         {tabs.map((t) => (
           <div
             key={t.id}
             onClick={() => setActiveId(t.id)}
             className={cn(
               "group flex items-center gap-1.5 h-7 px-2.5 rounded-md text-xs cursor-pointer max-w-[180px] transition-colors",
-              t.id === activeId ? "bg-background border border-border" : "hover:bg-background/60"
+              t.id === activeId ? "bg-[#1a1a1a] border border-[#ec4899]/40" : "hover:bg-[#1a1a1a]/60"
             )}
           >
             <Globe className="h-3 w-3 text-muted-foreground shrink-0" />
@@ -157,7 +157,7 @@ export function BrowserPanel() {
                 className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent"
               >
                 <span>{s.icon}</span><span className="flex-1 text-left">{s.name}</span>
-                {searchEngineId === s.id && <span className="text-emerald-500">✓</span>}
+                {searchEngineId === s.id && <span className="synnical-accent">✓</span>}
               </button>
             ))}
           </PopoverContent>
@@ -169,13 +169,13 @@ export function BrowserPanel() {
           onClick={() => setUseProxy(!useProxy)}
           title={useProxy ? "Proxy ON — bypasses anti-iframe blocks" : "Proxy OFF — direct iframe"}
         >
-          {useProxy ? <Shield className="h-3.5 w-3.5 text-emerald-500" /> : <ShieldOff className="h-3.5 w-3.5 text-muted-foreground" />}
+          {useProxy ? <Shield className="h-3.5 w-3.5 synnical-accent" /> : <ShieldOff className="h-3.5 w-3.5 text-muted-foreground" />}
           {useProxy ? "Proxy" : "Direct"}
         </Button>
       </div>
 
       {/* Toolbar */}
-      <div className="h-11 shrink-0 px-2 flex items-center gap-1 border-b border-border">
+      <div className="h-11 shrink-0 px-2 flex items-center gap-1 border-b border-[#2a2a2a] bg-[#0d0d0d]">
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={back} aria-label="Back">
           <ArrowLeft className="h-4 w-4" />
         </Button>
@@ -194,15 +194,15 @@ export function BrowserPanel() {
         >
           <div className="relative w-full">
             {useProxy ? (
-              <Shield className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-emerald-500" />
+              <Shield className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 synnical-accent" />
             ) : (
-              <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-emerald-500" />
+              <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 synnical-accent" />
             )}
             <Input
               value={active.input}
               onChange={(e) => updateTab(active.id, { input: e.target.value })}
               placeholder={`Search ${searchEngine(searchEngineId).name} or enter address`}
-              className="h-8 pl-8 pr-20 text-sm"
+              className="h-8 pl-8 pr-20 text-sm synnical-input"
               autoFocus
             />
             <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
@@ -213,7 +213,7 @@ export function BrowserPanel() {
                   className="p-1 rounded hover:bg-accent text-muted-foreground"
                   aria-label={bookmarked ? "Remove bookmark" : "Add bookmark"}
                 >
-                  {bookmarked ? <Star className="h-3.5 w-3.5 text-amber-500" /> : <StarOff className="h-3.5 w-3.5" />}
+                  {bookmarked ? <Star className="h-3.5 w-3.5 synnical-accent" /> : <StarOff className="h-3.5 w-3.5 text-muted-foreground" />}
                 </button>
               )}
               {active.input && (
@@ -301,13 +301,13 @@ function NewTabPage({
 }) {
   const [query, setQuery] = useState("")
   return (
-    <div className="h-full overflow-y-auto bg-background">
+    <div className="h-full overflow-y-auto synnical-bg">
       <div className="max-w-2xl mx-auto px-4 py-10 sm:py-16 flex flex-col items-center">
-        <div className="h-16 w-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
-          <Globe className="h-8 w-8 text-emerald-500" />
+        <div className="h-16 w-16 rounded-2xl bg-[#ec4899]/10 border border-[#ec4899]/30 flex items-center justify-center mb-4">
+          <Globe className="h-8 w-8 synnical-accent" />
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight">Stratus Browser</h1>
-        <p className="text-sm text-muted-foreground mt-1 mb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-white">Synnical</h1>
+        <p className="text-sm text-gray-400 mt-1 mb-6">
           Search the web or enter an address. Proxy mode bypasses anti-iframe blocks on many sites.
         </p>
         <form
@@ -333,7 +333,7 @@ function NewTabPage({
               <button
                 key={q.url}
                 onClick={() => onNavigate(q.url)}
-                className="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-border hover:border-emerald-500/40 hover:bg-accent transition-colors"
+                className="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-[#2a2a2a] hover:border-[#ec4899]/40 hover:bg-[#1a1a1a] transition-colors"
               >
                 <span className="text-2xl">{q.icon}</span>
                 <span className="text-xs">{q.name}</span>

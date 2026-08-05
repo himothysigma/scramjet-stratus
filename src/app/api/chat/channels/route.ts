@@ -2,20 +2,21 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { getCurrentUser } from "@/lib/auth"
 
-// GET /api/chat/channels — list all channels (real, only created by users)
+// GET /api/chat/channels — list public channels only (isDM = false)
 export async function GET() {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const channels = await db.channel.findMany({
+    where: { isDM: false },
     orderBy: { createdAt: "asc" },
     include: { _count: { select: { messages: true } } },
   })
 
-  // Ensure a "general" channel always exists.
   if (channels.length === 0) {
     await db.channel.create({ data: { name: "general" } })
     const fresh = await db.channel.findMany({
+      where: { isDM: false },
       orderBy: { createdAt: "asc" },
       include: { _count: { select: { messages: true } } },
     })
@@ -24,7 +25,7 @@ export async function GET() {
   return NextResponse.json({ channels })
 }
 
-// POST /api/chat/channels — create a channel
+// POST /api/chat/channels — create a public channel
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
