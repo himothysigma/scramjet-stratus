@@ -1,6 +1,6 @@
 "use client"
 
-import { Crown, Shield, Wrench, User as UserIcon } from "lucide-react"
+import { Crown, Shield, Wrench, User as UserIcon, Star, Sparkles, Snowflake, Circle, Hexagon } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { Role } from "@/lib/api"
 import { cn } from "@/lib/utils"
@@ -76,19 +76,20 @@ export function AvatarWithDeco({
   )
 }
 
-// Profile effect particles (CSS-only, owner-only feature)
+// Profile effect particles (lucide icons, CSS-animated, owner-only feature)
 export function ProfileEffectLayer({ effect }: { effect: string | null | undefined }) {
   if (!effect || effect === "none") return null
 
-  const configs: Record<string, { emoji: string; count: number; duration: [number, number] }> = {
-    "falling-stars": { emoji: "✨", count: 20, duration: [4, 9] },
-    confetti: { emoji: "🎉", count: 15, duration: [3, 7] },
-    snow: { emoji: "❄️", count: 25, duration: [5, 12] },
-    bubbles: { emoji: "○", count: 18, duration: [4, 8] },
-    fireflies: { emoji: "🟡", count: 15, duration: [6, 10] },
+  const configs: Record<string, { Icon: typeof Star; count: number; duration: [number, number]; color: string; sizeRange: [number, number] }> = {
+    "falling-stars": { Icon: Star, count: 20, duration: [4, 9], color: "#fbbf24", sizeRange: [10, 20] },
+    confetti: { Icon: Sparkles, count: 18, duration: [3, 7], color: "#ec4899", sizeRange: [10, 18] },
+    snow: { Icon: Snowflake, count: 25, duration: [5, 12], color: "#e0e7ff", sizeRange: [8, 16] },
+    bubbles: { Icon: Circle, count: 18, duration: [4, 8], color: "#38bdf8", sizeRange: [8, 18] },
+    fireflies: { Icon: Hexagon, count: 15, duration: [6, 10], color: "#a3e635", sizeRange: [8, 14] },
   }
   const cfg = configs[effect]
   if (!cfg) return null
+  const { Icon } = cfg
 
   return (
     <div className="profile-effect-layer">
@@ -96,7 +97,7 @@ export function ProfileEffectLayer({ effect }: { effect: string | null | undefin
         const left = Math.random() * 100
         const delay = Math.random() * 5
         const dur = cfg.duration[0] + Math.random() * (cfg.duration[1] - cfg.duration[0])
-        const fontSize = 10 + Math.random() * 14
+        const size = cfg.sizeRange[0] + Math.random() * (cfg.sizeRange[1] - cfg.sizeRange[0])
         return (
           <span
             key={i}
@@ -105,10 +106,9 @@ export function ProfileEffectLayer({ effect }: { effect: string | null | undefin
               left: `${left}%`,
               animationDelay: `${delay}s`,
               animationDuration: `${dur}s`,
-              fontSize: `${fontSize}px`,
             }}
           >
-            {cfg.emoji}
+            <Icon style={{ width: `${size}px`, height: `${size}px`, color: cfg.color }} fill={cfg.color} />
           </span>
         )
       })}

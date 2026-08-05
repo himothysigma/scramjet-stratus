@@ -19,7 +19,7 @@ async function main() {
   attachChat(httpServer)
 
   httpServer.listen(port, hostname, () => {
-    console.log(`> Stratus ready on http://${hostname}:${port} (dev=${dev})`)
+    console.log(`> Synnical ready on http://${hostname}:${port} (dev=${dev})`)
   })
 }
 

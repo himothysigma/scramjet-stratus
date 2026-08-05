@@ -41,7 +41,7 @@ export function CloudGamingPanel() {
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <Globe className="h-3.5 w-3.5" /> {region().flag} {ping}ms
+              <Globe className="h-3.5 w-3.5" /> {region().code} {ping}ms
             </span>
             <span className="flex items-center gap-1">
               <Gauge className="h-3.5 w-3.5" /> {q.name.split(" ")[0]}
@@ -80,7 +80,7 @@ export function CloudGamingPanel() {
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Cloud Gaming</h1>
             <p className="text-sm text-muted-foreground">
-              {region().flag} {region().name} · ~{ping}ms · {quality().name}
+              {region().code} {region().name} · ~{ping}ms · {quality().name}
             </p>
           </div>
         </div>

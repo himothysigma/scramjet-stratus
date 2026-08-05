@@ -38,7 +38,7 @@ export function AuthScreen() {
             <div className="h-14 w-14 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-3">
               <Cloud className="h-7 w-7 text-pink-500" />
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight">Stratus</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Synnical</h1>
             <p className="text-sm text-muted-foreground mt-1">Cloud gaming, chat & browser</p>
           </div>
 

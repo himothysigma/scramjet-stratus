@@ -1,4 +1,4 @@
-// Client-side constants for Stratus
+// Client-side constants for Synnical
 
 export type GameDef = {
   id: string
@@ -95,15 +95,15 @@ export const GAMES: GameDef[] = [
   },
 ]
 
-// Cloud gaming regions (real preference — stored + shown, drives ping indicator)
+// Cloud gaming regions (text codes, no flag emojis)
 export const REGIONS = [
-  { id: "auto", name: "Auto (Nearest)", flag: "⚡" },
-  { id: "eu-west", name: "Europe West", flag: "🇪🇺" },
-  { id: "eu-north", name: "Europe North", flag: "🇬🇧" },
-  { id: "us-east", name: "US East", flag: "🇺🇸" },
-  { id: "us-west", name: "US West", flag: "🇺🇸" },
-  { id: "ap-south", name: "Asia South", flag: "🇮🇳" },
-  { id: "ap-east", name: "Asia East", flag: "🇯🇵" },
+  { id: "auto", name: "Auto (Nearest)", code: "AUTO" },
+  { id: "eu-west", name: "Europe West", code: "EU" },
+  { id: "eu-north", name: "Europe North", code: "UK" },
+  { id: "us-east", name: "US East", code: "US" },
+  { id: "us-west", name: "US West", code: "US" },
+  { id: "ap-south", name: "Asia South", code: "IN" },
+  { id: "ap-east", name: "Asia East", code: "JP" },
 ] as const
 
 // Stream quality (real — controls the game frame render scale)
@@ -114,22 +114,41 @@ export const QUALITY_LEVELS = [
   { id: "ultra", name: "Ultra (Native)", scale: 1 },
 ] as const
 
-// Browser quick links (real URLs)
-export const QUICK_LINKS = [
-  { name: "Wikipedia", url: "https://en.wikipedia.org", icon: "📚" },
-  { name: "MDN", url: "https://developer.mozilla.org", icon: "📖" },
-  { name: "Hacker News", url: "https://news.ycombinator.com", icon: "📰" },
-  { name: "Lobsters", url: "https://lobste.rs", icon: "🦞" },
-  { name: "Archive.org", url: "https://archive.org", icon: "🗄️" },
-  { name: "DuckDuckGo", url: "https://duckduckgo.com", icon: "🦆" },
-  { name: "Raccoon", url: "https://www.raccoongame.com/#/platform/cloudgame", icon: "🎮" },
+// Browser quick links — icon is a lucide-react icon name string
+import type { LucideIcon } from "lucide-react"
+import {
+  BookOpen, Code, Newspaper, Archive, Search, Gamepad2, Film,
+} from "lucide-react"
+
+export type QuickLink = {
+  name: string
+  url: string
+  icon: LucideIcon
+}
+
+export const QUICK_LINKS: QuickLink[] = [
+  { name: "Wikipedia", url: "https://en.wikipedia.org", icon: BookOpen },
+  { name: "MDN", url: "https://developer.mozilla.org", icon: Code },
+  { name: "Hacker News", url: "https://news.ycombinator.com", icon: Newspaper },
+  { name: "Lobsters", url: "https://lobste.rs", icon: Newspaper },
+  { name: "Archive.org", url: "https://archive.org", icon: Archive },
+  { name: "DuckDuckGo", url: "https://duckduckgo.com", icon: Search },
+  { name: "Raccoon", url: "https://www.raccoongame.com/#/platform/cloudgame", icon: Gamepad2 },
+  { name: "Cineb", url: "https://cineb.best/", icon: Film },
 ]
 
-// Search engines (real — used by the address bar)
-export const SEARCH_ENGINES = [
-  { id: "duckduckgo", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=", icon: "🦆" },
-  { id: "google", name: "Google", url: "https://www.google.com/search?q=", icon: "🔍" },
-  { id: "bing", name: "Bing", url: "https://www.bing.com/search?q=", icon: "🅱️" },
-  { id: "startpage", name: "Startpage", url: "https://www.startpage.com/sp/search?query=", icon: "🛡️" },
-  { id: "wikipedia", name: "Wikipedia", url: "https://en.wikipedia.org/w/index.php?search=", icon: "📚" },
-] as const
+// Search engines — icon is a lucide-react icon
+export type SearchEngine = {
+  id: string
+  name: string
+  url: string
+  icon: LucideIcon
+}
+
+export const SEARCH_ENGINES: SearchEngine[] = [
+  { id: "duckduckgo", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=", icon: Search },
+  { id: "google", name: "Google", url: "https://www.google.com/search?q=", icon: Search },
+  { id: "bing", name: "Bing", url: "https://www.bing.com/search?q=", icon: Search },
+  { id: "startpage", name: "Startpage", url: "https://www.startpage.com/sp/search?query=", icon: Search },
+  { id: "wikipedia", name: "Wikipedia", url: "https://en.wikipedia.org/w/index.php?search=", icon: BookOpen },
+]

@@ -1,6 +1,6 @@
 import type { Server as HTTPServer } from "http"
 import { Server as IOServer } from "socket.io"
-import { db } from "@/lib/db"
+import { db } from "./db"
 
 interface ClientUser {
   userId: string
@@ -43,7 +43,7 @@ function readCookie(cookieHeader: string | undefined): string | null {
 }
 
 /**
- * Attach the Stratus real-time chat (socket.io) to an existing HTTP server.
+ * Attach the Synnical real-time chat (socket.io) to an existing HTTP server.
  * Used by the custom server (server.ts) for Replit / single-port hosts.
  * Mirrors mini-services/chat-service/index.ts logic using Prisma.
  */

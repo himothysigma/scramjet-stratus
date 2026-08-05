@@ -75,9 +75,9 @@ export function AppShell() {
       <footer className="h-8 shrink-0 border-t border-border bg-background flex items-center justify-between px-3 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-pink-500 animate-pulse" />
-          <span>Region: {region.flag} {region.name}</span>
+          <span>Region: {region.code} {region.name}</span>
         </div>
-        <span className="hidden sm:block">Stratus · everything here actually works</span>
+        <span className="hidden sm:block">Synnical · everything here actually works</span>
       </footer>
     </div>
   )

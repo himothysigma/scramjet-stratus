@@ -26,7 +26,7 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
         <div className="h-8 w-8 rounded-lg bg-pink-500/10 border border-pink-500/20 flex items-center justify-center">
           <Cloud className="h-4.5 w-4.5 text-pink-500" />
         </div>
-        <span className="font-semibold tracking-tight hidden sm:block">Stratus</span>
+        <span className="font-semibold tracking-tight hidden sm:block">Synnical</span>
       </button>
 
       <div className="flex-1" />
@@ -39,7 +39,7 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
             <Button variant="ghost" size="sm" className="gap-1.5 h-9">
               <Globe className="h-4 w-4 text-pink-500" />
               <span className="hidden md:inline text-xs">
-                {REGIONS.find((r) => r.id === regionId)?.flag} {REGIONS.find((r) => r.id === regionId)?.name.split(" ")[0]}
+                {REGIONS.find((r) => r.id === regionId)?.code} {REGIONS.find((r) => r.id === regionId)?.name.split(" ")[0]}
               </span>
             </Button>
           </PopoverTrigger>
@@ -51,7 +51,7 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
                 onClick={() => setRegion(r.id)}
                 className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent transition-colors"
               >
-                <span className="text-base">{r.flag}</span>
+                <span className="text-xs font-mono text-pink-500">{r.code}</span>
                 <span className="flex-1 text-left">{r.name}</span>
                 {regionId === r.id && <Check className="h-4 w-4 text-pink-500" />}
               </button>

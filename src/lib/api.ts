@@ -1,4 +1,4 @@
-// Frontend API helpers for Stratus
+// Frontend API helpers for Synnical
 
 export type Role = "OWNER" | "ADMIN" | "MOD" | "MEMBER"
 
