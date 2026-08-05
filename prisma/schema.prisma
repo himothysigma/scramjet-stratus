@@ -1,0 +1,94 @@
+// Scramjet Stratus — schema with roles, DMs, friends, profile effects, moderation
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  passwordHash  String
+  displayName   String
+  bio           String    @default("")
+  status        String    @default("")
+  pfpUrl        String?
+  bannerUrl     String?
+  pfpIsGif      Boolean   @default(false)
+  bannerIsGif   Boolean   @default(false)
+  avatarDeco    String?
+  profileEffect String?
+  role          String    @default("MEMBER")
+  muted         Boolean   @default(false)
+  mutedUntil    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions         Session[]
+  messages         Message[]
+  memberships      Membership[]
+  sentRequests     Friendship[] @relation("FriendRequester")
+  receivedRequests Friendship[] @relation("FriendReceiver")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([token])
+}
+
+model Channel {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  isDM      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  messages    Message[]
+  memberships Membership[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  channelId String
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  username  String
+  content   String
+  deleted   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([channelId, createdAt])
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channelId String
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, channelId])
+}
+
+model Friendship {
+  id          String   @id @default(cuid())
+  requesterId String
+  receiverId String
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  requester   User     @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("FriendReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, receiverId])
+  @@index([receiverId, status])
+}
