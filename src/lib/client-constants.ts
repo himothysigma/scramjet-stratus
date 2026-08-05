@@ -5,6 +5,7 @@ export type GameDef = {
   name: string
   description: string
   url: string
+  cover: string
   category: "Arcade" | "Puzzle" | "Action"
   controls: string
   accent: string
@@ -17,6 +18,7 @@ export const GAMES: GameDef[] = [
     name: "Neon Snake",
     description: "Classic snake. Eat, grow, survive. Speeds up as you score.",
     url: "/games/snake.html",
+    cover: "/games/covers/snake.png",
     category: "Arcade",
     controls: "Arrows / WASD / Swipe",
     accent: "#22c55e",
@@ -26,6 +28,7 @@ export const GAMES: GameDef[] = [
     name: "2048",
     description: "Slide and merge tiles to reach 2048.",
     url: "/games/2048.html",
+    cover: "/games/covers/2048.png",
     category: "Puzzle",
     controls: "Arrows / WASD / Swipe",
     accent: "#f59e0b",
@@ -35,6 +38,7 @@ export const GAMES: GameDef[] = [
     name: "Breakout",
     description: "Bounce the ball, smash every brick. Don't drop it.",
     url: "/games/breakout.html",
+    cover: "/games/covers/breakout.png",
     category: "Action",
     controls: "Mouse / Arrows / Touch",
     accent: "#ef4444",
@@ -44,9 +48,50 @@ export const GAMES: GameDef[] = [
     name: "Tetris",
     description: "Stack tetrominoes, clear lines, climb levels.",
     url: "/games/tetris.html",
+    cover: "/games/covers/tetris.png",
     category: "Puzzle",
     controls: "Arrows / Space",
     accent: "#8b5cf6",
+  },
+  {
+    id: "pong",
+    name: "Pong Duel",
+    description: "Paddle vs AI. First to 7 wins. Ball speeds up every hit.",
+    url: "/games/pong.html",
+    cover: "/games/covers/pong.png",
+    category: "Arcade",
+    controls: "Mouse / Arrows / Touch",
+    accent: "#06b6d4",
+  },
+  {
+    id: "minesweeper",
+    name: "Minesweeper Grid",
+    description: "Find every mine without blowing up. Flag and reveal.",
+    url: "/games/minesweeper.html",
+    cover: "/games/covers/minesweeper.png",
+    category: "Puzzle",
+    controls: "Click / Right-click / Long-press",
+    accent: "#f43f5e",
+  },
+  {
+    id: "memory",
+    name: "Memory Match",
+    description: "Flip cards, match pairs, beat your best move count.",
+    url: "/games/memory.html",
+    cover: "/games/covers/memory.png",
+    category: "Puzzle",
+    controls: "Click / Tap",
+    accent: "#eab308",
+  },
+  {
+    id: "invaders",
+    name: "Void Invaders",
+    description: "Shoot the alien fleet. Survive 6 waves. Don't get hit.",
+    url: "/games/invaders.html",
+    cover: "/games/covers/invaders.png",
+    category: "Action",
+    controls: "Arrows / A-D / Space",
+    accent: "#a855f7",
   },
 ]
 
@@ -69,10 +114,21 @@ export const QUALITY_LEVELS = [
   { id: "ultra", name: "Ultra (Native)", scale: 1 },
 ] as const
 
-// Browser quick links (real URLs that work in iframe where allowed)
+// Browser quick links (real URLs)
 export const QUICK_LINKS = [
-  { name: "Wikipedia", url: "https://en.wikipedia.org" },
-  { name: "MDN", url: "https://developer.mozilla.org" },
-  { name: "Hacker News", url: "https://news.ycombinator.com" },
-  { name: "Lobsters", url: "https://lobste.rs" },
+  { name: "Wikipedia", url: "https://en.wikipedia.org", icon: "📚" },
+  { name: "MDN", url: "https://developer.mozilla.org", icon: "📖" },
+  { name: "Hacker News", url: "https://news.ycombinator.com", icon: "📰" },
+  { name: "Lobsters", url: "https://lobste.rs", icon: "🦞" },
+  { name: "Archive.org", url: "https://archive.org", icon: "🗄️" },
+  { name: "DuckDuckGo", url: "https://duckduckgo.com", icon: "🦆" },
 ]
+
+// Search engines (real — used by the address bar)
+export const SEARCH_ENGINES = [
+  { id: "duckduckgo", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=", icon: "🦆" },
+  { id: "google", name: "Google", url: "https://www.google.com/search?q=", icon: "🔍" },
+  { id: "bing", name: "Bing", url: "https://www.bing.com/search?q=", icon: "🅱️" },
+  { id: "startpage", name: "Startpage", url: "https://www.startpage.com/sp/search?query=", icon: "🛡️" },
+  { id: "wikipedia", name: "Wikipedia", url: "https://en.wikipedia.org/w/index.php?search=", icon: "📚" },
+] as const

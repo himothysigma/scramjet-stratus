@@ -89,29 +89,33 @@ export function CloudGamingPanel() {
           Pick a game and play instantly in your browser. Use the region and quality extensions in the top bar to tune your session.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {GAMES.map((g) => (
             <button
               key={g.id}
               onClick={() => setActive(g)}
               className="group text-left rounded-xl border border-border bg-card hover:border-emerald-500/40 hover:shadow-lg transition-all overflow-hidden"
             >
-              <div
-                className="h-28 flex items-center justify-center relative"
-                style={{ background: `linear-gradient(135deg, ${g.accent}22, ${g.accent}08)` }}
-              >
-                <Gamepad2 className="h-9 w-9" style={{ color: g.accent }} />
-                <span className="absolute top-2 right-2 text-[10px] font-medium px-1.5 py-0.5 rounded bg-background/80 backdrop-blur text-muted-foreground">
+              <div className="aspect-[16/10] relative overflow-hidden bg-muted">
+                <img
+                  src={g.cover}
+                  alt={`${g.name} cover`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+                <span className="absolute top-2 right-2 text-[10px] font-medium px-1.5 py-0.5 rounded bg-black/70 backdrop-blur text-white">
                   {g.category}
                 </span>
-              </div>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-semibold">{g.name}</h3>
-                  <Play className="h-4 w-4 text-muted-foreground group-hover:text-emerald-500 transition-colors" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+                  <span className="flex items-center gap-1 text-xs font-medium text-white">
+                    <Play className="h-3 w-3 fill-white" /> Play now
+                  </span>
                 </div>
-                <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{g.description}</p>
-                <p className="text-[11px] text-muted-foreground/80">{g.controls}</p>
+              </div>
+              <div className="p-3">
+                <h3 className="font-semibold text-sm truncate">{g.name}</h3>
+                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{g.description}</p>
+                <p className="text-[10px] text-muted-foreground/70 mt-1">{g.controls}</p>
               </div>
             </button>
           ))}

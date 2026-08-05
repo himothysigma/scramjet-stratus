@@ -53,14 +53,25 @@ export function ChatPanel() {
     loadChannels()
   }, [loadChannels])
 
-  // Connect socket once
+  // Connect socket once.
+  // - Sandbox (Caddy gateway): uses "/?XTransformPort=3001" via the gateway.
+  // - Replit / standard host: set NEXT_PUBLIC_SOCKET_URL (e.g. "/socket.io")
+  //   so the custom server (server.ts) serves socket.io on the same origin.
   useEffect(() => {
-    const s = io("/?XTransformPort=3001", {
-      transports: ["websocket", "polling"],
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-    })
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || ""
+    const s = socketUrl
+      ? io(socketUrl, {
+          transports: ["websocket", "polling"],
+          reconnection: true,
+          reconnectionAttempts: Infinity,
+          reconnectionDelay: 1000,
+        })
+      : io("/?XTransformPort=3001", {
+          transports: ["websocket", "polling"],
+          reconnection: true,
+          reconnectionAttempts: Infinity,
+          reconnectionDelay: 1000,
+        })
     setSocket(s)
 
     s.on("connect", () => setConnected(true))
