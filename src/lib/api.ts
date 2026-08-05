@@ -52,7 +52,14 @@ async function jsonFetch<T>(url: string, opts?: RequestInit): Promise<T> {
     ...opts,
   })
   const data = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error((data as any).error || "Request failed")
+  if (!res.ok) {
+    // If 401, the session is stale — redirect to login page
+    if (res.status === 401 && typeof window !== "undefined") {
+      // Clear any stale state and reload to show the login screen
+      window.location.href = "/"
+    }
+    throw new Error((data as any).error || "Request failed")
+  }
   return data as T
 }
 

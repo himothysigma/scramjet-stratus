@@ -7,7 +7,7 @@ import { OWNER_PASSWORD } from "@/lib/constants"
 // Owner is NEVER granted by default — only here, with the password.
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!user) return NextResponse.json({ error: "Your session has expired. Please log out and log back in, then try again." }, { status: 401 })
 
   const { password } = await req.json()
   if (typeof password !== "string") {
