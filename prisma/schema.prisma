@@ -64,6 +64,8 @@ model Message {
   username  String
   content   String
   deleted   Boolean  @default(false)
+  edited    Boolean  @default(false)
+  editedAt  DateTime?
   createdAt DateTime @default(now())
 
   @@index([channelId, createdAt])

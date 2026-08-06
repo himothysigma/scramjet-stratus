@@ -40,6 +40,23 @@ export const QUALITY_LEVELS = [
   { id: "ultra", name: "Ultra (Native)", scale: 1 },
 ] as const
 
+// External cloud game sources (embedded under Gaming → Cloud Games tab)
+// These are real game platforms loaded in an iframe.
+export type GameSource = {
+  id: string
+  name: string
+  url: string
+  thumbnail: string
+  description: string
+}
+
+export const GAME_SOURCES: GameSource[] = [
+  { id: "raccoon", name: "Raccoon Cloud Games", url: "https://www.raccoongame.com/#/platform/cloudgame", thumbnail: "https://www.google.com/s2/favicons?domain=raccoongame.com&sz=128", description: "AAA cloud gaming — stream games directly in browser." },
+  { id: "crazygames", name: "CrazyGames", url: "https://www.crazygames.com/", thumbnail: "https://www.google.com/s2/favicons?domain=crazygames.com&sz=128", description: "Thousands of free browser games." },
+  { id: "genizymath", name: "Genizy Math Games", url: "https://genizymath.github.io/", thumbnail: "https://www.google.com/s2/favicons?domain=genizymath.github.io&sz=128", description: "Educational + fun math games." },
+  { id: "crackstuff", name: "Crackstuff Games", url: "https://crackstuff.pages.dev/games", thumbnail: "https://www.google.com/s2/favicons?domain=crackstuff.pages.dev&sz=128", description: "Cracked/unblocked game collection." },
+]
+
 // Quick links — real website thumbnails (favicons via Google's service, NOT emojis/icons)
 export type QuickLink = { name: string; url: string; thumbnail: string }
 

@@ -100,6 +100,8 @@ export const api = {
     jsonFetch<{ ok: true }>("/api/moderation/unmute", { method: "POST", body: JSON.stringify({ userId }) }),
   deleteMessage: (id: string) =>
     jsonFetch<{ ok: true; id: string; channelId: string }>(`/api/messages/${id}`, { method: "DELETE" }),
+  editMessage: (id: string, content: string) =>
+    jsonFetch<{ ok: true }>(`/api/messages/edit`, { method: "PATCH", body: JSON.stringify({ id, content }) }),
 
   // friends + DMs
   listFriends: () => jsonFetch<{ friends: SafeUser[]; incoming: SafeUser[]; outgoing: SafeUser[] }>("/api/friends/list"),

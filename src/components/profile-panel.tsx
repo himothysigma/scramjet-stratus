@@ -21,6 +21,7 @@ export function ProfilePanel() {
   const [displayName, setDisplayName] = useState(user?.displayName || "")
   const [bio, setBio] = useState(user?.bio || "")
   const [status, setStatus] = useState(user?.status || "")
+  const [username, setUsername] = useState(user?.username || "")
   const [saving, setSaving] = useState(false)
   const [savingStatus, setSavingStatus] = useState(false)
   const [savingDeco, setSavingDeco] = useState(false)
@@ -35,12 +36,12 @@ export function ProfilePanel() {
   if (!user) return null
 
   const isOwner = user.role === "OWNER"
-  const dirty = displayName !== user.displayName || bio !== user.bio
+  const dirty = displayName !== user.displayName || bio !== user.bio || username !== user.username
 
   const saveProfile = async () => {
     setSaving(true)
     try {
-      const { user: updated } = await api.updateProfile({ displayName, bio })
+      const { user: updated } = await api.updateProfile({ displayName, bio, username })
       setUser(updated); toast.success("Profile saved")
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed") }
     finally { setSaving(false) }
@@ -59,10 +60,12 @@ export function ProfilePanel() {
     const file = e.target.files?.[0]
     e.target.value = ""
     if (!file || !file.type.startsWith("image/")) { toast.error("Please choose an image"); return }
-    // GIF: owner can upload directly (no crop, preserves animation); non-owner blocked
+    // GIF: owner can crop+zoom too (cropper outputs PNG, so animation is lost — ask first)
     if (file.type === "image/gif") {
       if (!isOwner) { toast.error("GIF profile pictures are owner-only"); return }
-      uploadDirect("pfp", file); return
+      // Route through cropper so owner can zoom/rotate. Output is PNG (static).
+      // To keep animation, they can skip crop — handled by a direct upload button below.
+      setCropSrc(URL.createObjectURL(file)); setCropMode("pfp"); setCropOpen(true); return
     }
     setCropSrc(URL.createObjectURL(file)); setCropMode("pfp"); setCropOpen(true)
   }
@@ -73,7 +76,8 @@ export function ProfilePanel() {
     if (!file || !file.type.startsWith("image/")) { toast.error("Please choose an image"); return }
     if (file.type === "image/gif") {
       if (!isOwner) { toast.error("GIF banners are owner-only"); return }
-      uploadDirect("banner", file); return
+      // Route through cropper so owner can zoom/rotate. Output is PNG (static).
+      setCropSrc(URL.createObjectURL(file)); setCropMode("banner"); setCropOpen(true); return
     }
     setCropSrc(URL.createObjectURL(file)); setCropMode("banner"); setCropOpen(true)
   }
@@ -146,8 +150,13 @@ export function ProfilePanel() {
         {/* Editable fields */}
         <div className="mt-6 space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="displayName">Display name {isOwner && <span className="text-amber-500 text-xs">(owner: 1 char min)</span>}</Label>
+            <Label htmlFor="displayName">Display name</Label>
             <Input id="displayName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} maxLength={32} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="username">Username {isOwner && <span className="text-amber-500 text-xs">(owner: 1 char min)</span>}</Label>
+            <Input id="username" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))} maxLength={24} />
+            <p className="text-xs text-muted-foreground">Lowercase letters, numbers, hyphens, underscores. {isOwner ? "Owner can use 1 char." : "Min 2 chars."}</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="bio">Bio</Label>

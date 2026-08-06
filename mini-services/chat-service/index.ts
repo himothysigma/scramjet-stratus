@@ -42,6 +42,8 @@ const getChannel = sqlite.prepare(`SELECT id, name, isDM FROM Channel WHERE id =
 const getDMMembers = sqlite.prepare(`SELECT userId FROM Membership WHERE channelId = ?`)
 const getUserMute = sqlite.prepare(`SELECT muted, mutedUntil FROM User WHERE id = ?`)
 const markMessageDeleted = sqlite.prepare(`UPDATE Message SET deleted = 1, content = '' WHERE id = ?`)
+const getMessageById = sqlite.prepare(`SELECT id, userId FROM Message WHERE id = ?`)
+const editMessage = sqlite.prepare(`UPDATE Message SET content = ?, edited = 1, editedAt = ? WHERE id = ?`)
 
 interface SessionRow {
   token: string
@@ -73,6 +75,7 @@ interface ClientUser {
   role: string
   muted: boolean
   mutedUntil: string | null
+  activity?: string
 }
 
 function safeUser(r: SessionRow): ClientUser {
@@ -192,6 +195,32 @@ io.on("connection", (socket) => {
     if (user.role !== "OWNER") return
     markMessageDeleted.run(messageId)
     io.to(`channel:${channelId}`).emit("message-deleted", { id: messageId, channelId })
+  })
+
+  // Edit your own message
+  socket.on("edit-message", ({ messageId, channelId, content }: { messageId: string; channelId: string; content: string }) => {
+    const text = typeof content === "string" ? content.trim() : ""
+    if (text.length === 0 || text.length > 2000) return
+    // Verify ownership
+    const msg = getMessageById.get(messageId) as { userId: string } | null
+    if (!msg || msg.userId !== user.userId) return
+    editMessage.run(text, new Date().toISOString(), messageId)
+    io.to(`channel:${channelId}`).emit("message-edited", { id: messageId, channelId, content: text, editedAt: new Date().toISOString() })
+  })
+
+  // Typing indicator
+  socket.on("typing", ({ channelId, isTyping }: { channelId: string; isTyping: boolean }) => {
+    socket.to(`channel:${channelId}`).emit("typing", { channelId, userId: user.userId, username: user.displayName, isTyping })
+  })
+
+  // Rich presence — set what you're doing (e.g. "Playing Neon Snake")
+  socket.on("set-presence", ({ activity }: { activity: string }) => {
+    user.activity = typeof activity === "string" ? activity.slice(0, 100) : ""
+    online.set(socket.id, user)
+    // Broadcast to all channels the user is in
+    for (const [channelId, ids] of channelRooms.entries()) {
+      if (ids.has(socket.id)) broadcastPresence(channelId)
+    }
   })
 
   socket.on("disconnect", () => {

@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Hash, Plus, Send, Loader2, Users, MoreVertical, Trash2, VolumeX, Volume2 } from "lucide-react"
+import { Hash, Plus, Send, Loader2, Users, MoreVertical, Trash2, VolumeX, Volume2, Pencil } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { RoleBadge, DisplayName, AvatarWithDeco } from "@/components/role-ui"
@@ -42,6 +42,9 @@ export function ChatPanel() {
   const [newChannel, setNewChannel] = useState("")
   const [showNewChannel, setShowNewChannel] = useState(false)
   const [loadingChannels, setLoadingChannels] = useState(true)
+  const [typingUsers, setTypingUsers] = useState<{ userId: string; username: string }[]>([])
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editContent, setEditContent] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const loadChannels = useCallback(async () => {
@@ -82,12 +85,29 @@ export function ChatPanel() {
     socket.on("message-deleted", (data: { id: string; channelId: string }) => {
       setMessages((prev) => prev.map((m) => m.id === data.id ? { ...m, deleted: true, content: "" } : m))
     })
+    socket.on("message-edited", (data: { id: string; channelId: string; content: string; editedAt: string }) => {
+      setMessages((prev) => prev.map((m) => m.id === data.id ? { ...m, content: data.content, edited: true } : m))
+    })
+    socket.on("typing", (data: { channelId: string; userId: string; username: string; isTyping: boolean }) => {
+      if (data.channelId === activeChannel) {
+        setTypingUsers((prev) => {
+          const next = isTyping ? [...prev.filter((u) => u.userId !== data.userId), { userId: data.userId, username: data.username }] : prev.filter((u) => u.userId !== data.userId)
+          return next
+        })
+        // Auto-clear typing after 3s
+        if (isTyping) {
+          setTimeout(() => {
+            setTypingUsers((prev) => prev.filter((u) => u.userId !== data.userId))
+          }, 3000)
+        }
+      }
+    })
     socket.on("presence", (data: { channelId: string; users: PresenceUser[] }) => {
       if (data.channelId === activeChannel) setPresence(data.users)
     })
     return () => {
       socket.emit("leave-channel", { channelId: activeChannel })
-      socket.off("message-history"); socket.off("message"); socket.off("message-deleted"); socket.off("presence")
+      socket.off("message-history"); socket.off("message"); socket.off("message-deleted"); socket.off("message-edited"); socket.off("typing"); socket.off("presence")
     }
   }, [socket, activeChannel, connected])
 
@@ -99,7 +119,34 @@ export function ChatPanel() {
     const text = draft.trim()
     if (!text || !socket || !connected || !activeChannel) return
     socket.emit("send-message", { channelId: activeChannel, content: text })
+    socket.emit("typing", { channelId: activeChannel, isTyping: false })
     setDraft("")
+  }
+
+  const onDraftChange = (v: string) => {
+    setDraft(v)
+    if (socket && connected && activeChannel) {
+      socket.emit("typing", { channelId: activeChannel, isTyping: v.length > 0 })
+    }
+  }
+
+  const startEdit = (m: ChatMessage) => {
+    setEditingId(m.id)
+    setEditContent(m.content)
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditContent("")
+  }
+
+  const saveEdit = (m: ChatMessage) => {
+    if (!socket) return
+    api.editMessage(m.id, editContent).then(() => {
+      socket.emit("edit-message", { messageId: m.id, channelId: m.channelId, content: editContent })
+      cancelEdit()
+      toast.success("Message edited")
+    }).catch((e) => toast.error(e instanceof Error ? e.message : "Failed"))
   }
 
   const createChannel = async () => {
@@ -191,13 +238,18 @@ export function ChatPanel() {
             </div>
           )}
           {messages.map((m) => (
-            <MessageRow key={m.id} m={m} currentUser={user} onDelete={deleteMessage} />
+            <MessageRow key={m.id} m={m} currentUser={user} onDelete={deleteMessage} onEdit={saveEdit} />
           ))}
         </div>
 
         <div className="shrink-0 p-3 border-t border-border">
+          {typingUsers.length > 0 && (
+            <p className="text-xs text-muted-foreground mb-1.5 italic">
+              {typingUsers.length === 1 ? `${typingUsers[0].username} is typing…` : `${typingUsers.length} users are typing…`}
+            </p>
+          )}
           <div className="flex gap-2">
-            <Input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }} placeholder={`Message #${activeName}`} disabled={!connected} className="flex-1" />
+            <Input value={draft} onChange={(e) => onDraftChange(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }} placeholder={`Message #${activeName}`} disabled={!connected} className="flex-1" />
             <Button onClick={send} disabled={!connected || !draft.trim()} className="bg-pink-500 hover:bg-pink-600 text-white" size="icon" aria-label="Send"><Send className="h-4 w-4" /></Button>
           </div>
         </div>
@@ -246,7 +298,9 @@ export function ChatPanel() {
   )
 }
 
-function MessageRow({ m, currentUser, onDelete }: { m: ChatMessage; currentUser: SafeUser; onDelete: (m: ChatMessage) => void }) {
+function MessageRow({ m, currentUser, onDelete, onEdit }: { m: ChatMessage; currentUser: SafeUser; onDelete: (m: ChatMessage) => void; onEdit: (m: ChatMessage) => void }) {
+  const [editing, setEditing] = useState(false)
+  const [editText, setEditText] = useState(m.content)
   const own = m.userId === currentUser.id
   const role = (m.role || "MEMBER") as Role
   const name = m.displayName || m.username
@@ -268,13 +322,32 @@ function MessageRow({ m, currentUser, onDelete }: { m: ChatMessage; currentUser:
           <DisplayName name={name} role={role} className="text-sm font-semibold" />
           <RoleBadge role={role} />
           <span className="text-[10px] text-muted-foreground">{new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-          {canDelete(currentUser.role) && !own && (
-            <button onClick={() => onDelete(m)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity" aria-label="Delete message">
-              <Trash2 className="h-3 w-3" />
-            </button>
-          )}
+          {m.edited && <span className="text-[10px] text-muted-foreground italic">(edited)</span>}
+          <div className="ml-auto flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {own && !editing && (
+              <button onClick={() => { setEditing(true); setEditText(m.content) }} className="text-muted-foreground hover:text-pink-500" aria-label="Edit message">
+                <Pencil className="h-3 w-3" />
+              </button>
+            )}
+            {canDelete(currentUser.role) && !own && (
+              <button onClick={() => onDelete(m)} className="text-muted-foreground hover:text-destructive" aria-label="Delete message">
+                <Trash2 className="h-3 w-3" />
+              </button>
+            )}
+          </div>
         </div>
-        <p className="text-sm text-foreground/90 break-words whitespace-pre-wrap">{m.content}</p>
+        {editing ? (
+          <div className="flex gap-1.5 mt-0.5">
+            <Input value={editText} onChange={(e) => setEditText(e.target.value)} onKeyDown={(e) => {
+              if (e.key === "Enter") { e.preventDefault(); onEdit({ ...m, content: editText }); setEditing(false) }
+              if (e.key === "Escape") { setEditing(false); setEditText(m.content) }
+            }} className="h-7 text-sm flex-1" autoFocus />
+            <Button size="sm" className="h-7 px-2 bg-pink-500 hover:bg-pink-600 text-white" onClick={() => { onEdit({ ...m, content: editText }); setEditing(false) }}>Save</Button>
+            <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => { setEditing(false); setEditText(m.content) }}>Cancel</Button>
+          </div>
+        ) : (
+          <p className="text-sm text-foreground/90 break-words whitespace-pre-wrap">{m.content}</p>
+        )}
       </div>
     </div>
   )
