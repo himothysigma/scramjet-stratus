@@ -23,8 +23,8 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
         onClick={() => onPanel("chat")}
         className="flex items-center gap-2 px-2 mr-1 hover:opacity-80 transition-opacity"
       >
-        <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-          <Cloud className="h-4.5 w-4.5 text-emerald-500" />
+        <div className="h-8 w-8 rounded-lg bg-pink-500/10 border border-pink-500/20 flex items-center justify-center">
+          <Cloud className="h-4.5 w-4.5 text-pink-500" />
         </div>
         <span className="font-semibold tracking-tight hidden sm:block">Stratus</span>
       </button>
@@ -37,9 +37,9 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="sm" className="gap-1.5 h-9">
-              <Globe className="h-4 w-4 text-emerald-500" />
+              <Globe className="h-4 w-4 text-pink-500" />
               <span className="hidden md:inline text-xs">
-                {REGIONS.find((r) => r.id === regionId)?.flag} {REGIONS.find((r) => r.id === regionId)?.name.split(" ")[0]}
+                {REGIONS.find((r) => r.id === regionId)?.code} {REGIONS.find((r) => r.id === regionId)?.name.split(" ")[0]}
               </span>
             </Button>
           </PopoverTrigger>
@@ -51,9 +51,9 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
                 onClick={() => setRegion(r.id)}
                 className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent transition-colors"
               >
-                <span className="text-base">{r.flag}</span>
+                <span className="text-base">{r.code}</span>
                 <span className="flex-1 text-left">{r.name}</span>
-                {regionId === r.id && <Check className="h-4 w-4 text-emerald-500" />}
+                {regionId === r.id && <Check className="h-4 w-4 text-pink-500" />}
               </button>
             ))}
           </PopoverContent>
@@ -63,7 +63,7 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="sm" className="gap-1.5 h-9">
-              <Gauge className="h-4 w-4 text-emerald-500" />
+              <Gauge className="h-4 w-4 text-pink-500" />
               <span className="hidden md:inline text-xs">
                 {QUALITY_LEVELS.find((q) => q.id === qualityId)?.name.split(" ")[0]}
               </span>
@@ -78,7 +78,7 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
                 className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent transition-colors"
               >
                 <span className="flex-1 text-left">{q.name}</span>
-                {qualityId === q.id && <Check className="h-4 w-4 text-emerald-500" />}
+                {qualityId === q.id && <Check className="h-4 w-4 text-pink-500" />}
               </button>
             ))}
           </PopoverContent>
@@ -104,7 +104,7 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
         >
           <Avatar className="h-7 w-7">
             <AvatarImage src={user.pfpUrl || undefined} alt={user.displayName} />
-            <AvatarFallback className="bg-emerald-500/15 text-emerald-600 text-xs">
+            <AvatarFallback className="bg-pink-500/15 text-pink-600 text-xs">
               {user.displayName.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>

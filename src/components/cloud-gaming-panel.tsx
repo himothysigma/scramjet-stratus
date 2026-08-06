@@ -31,7 +31,7 @@ export function CloudGamingPanel() {
     // Real render-quality control: scale the frame. Lower quality = scaled down then upscaled.
     const scale = q.id === "low" ? 0.85 : q.id === "ultra" ? 1 : 1
     return (
-      <div className="h-[calc(100vh-3.5rem-2rem)] flex flex-col bg-background">
+      <div className="h-full flex flex-col bg-background">
         <div className="h-11 shrink-0 px-3 flex items-center justify-between border-b border-border">
           <div className="flex items-center gap-3 min-w-0">
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setActive(null)}>
@@ -41,7 +41,7 @@ export function CloudGamingPanel() {
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <Globe className="h-3.5 w-3.5" /> {region().flag} {ping}ms
+              <Globe className="h-3.5 w-3.5" /> {region().code} {ping}ms
             </span>
             <span className="flex items-center gap-1">
               <Gauge className="h-3.5 w-3.5" /> {q.name.split(" ")[0]}
@@ -71,16 +71,16 @@ export function CloudGamingPanel() {
   }
 
   return (
-    <div className="h-[calc(100vh-3.5rem-2rem)] overflow-y-auto">
+    <div className="h-full overflow-y-auto">
       <div className="p-5 sm:p-6 max-w-5xl mx-auto">
         <div className="flex items-center gap-3 mb-1">
-          <div className="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-            <Gamepad2 className="h-5 w-5 text-emerald-500" />
+          <div className="h-10 w-10 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center">
+            <Gamepad2 className="h-5 w-5 text-pink-500" />
           </div>
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Cloud Gaming</h1>
             <p className="text-sm text-muted-foreground">
-              {region().flag} {region().name} · ~{ping}ms · {quality().name}
+              {region().code} {region().name} · ~{ping}ms · {quality().name}
             </p>
           </div>
         </div>
@@ -94,7 +94,7 @@ export function CloudGamingPanel() {
             <button
               key={g.id}
               onClick={() => setActive(g)}
-              className="group text-left rounded-xl border border-border bg-card hover:border-emerald-500/40 hover:shadow-lg transition-all overflow-hidden"
+              className="group text-left rounded-xl border border-border bg-card hover:border-pink-500/40 hover:shadow-lg transition-all overflow-hidden"
             >
               <div className="aspect-[16/10] relative overflow-hidden bg-muted">
                 <img

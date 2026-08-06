@@ -114,7 +114,7 @@ export function BrowserPanel() {
   const bookmarked = active.input ? isBookmarked(active.input) : false
 
   return (
-    <div className="h-[calc(100vh-3.5rem-2rem)] flex flex-col synnical-bg">
+    <div className="h-full flex flex-col synnical-bg">
       {/* Tab strip */}
       <div className="h-9 shrink-0 flex items-center gap-1 px-2 border-b border-[#2a2a2a] bg-[#0d0d0d] overflow-x-auto">
         {tabs.map((t) => (
@@ -335,7 +335,7 @@ function NewTabPage({
                 onClick={() => onNavigate(q.url)}
                 className="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-[#2a2a2a] hover:border-[#ec4899]/40 hover:bg-[#1a1a1a] transition-colors"
               >
-                <span className="text-2xl">{q.icon}</span>
+                <img src={q.thumbnail} alt={q.name} className="h-8 w-8 rounded" />
                 <span className="text-xs">{q.name}</span>
               </button>
             ))}

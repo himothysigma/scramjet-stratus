@@ -11,7 +11,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-background">
-        <Loader2 className="h-7 w-7 animate-spin text-emerald-500" />
+        <Loader2 className="h-7 w-7 animate-spin text-pink-500" />
         <p className="text-sm text-muted-foreground">Loading Stratus…</p>
       </div>
     )

@@ -68,7 +68,7 @@ export function AvatarWithDeco({
       {src && <AvatarImage src={src} alt={name} />}
       <AvatarFallback className={cn(
         "text-xs",
-        role === "OWNER" ? "bg-amber-500/15 text-amber-500" : "bg-emerald-500/15 text-emerald-600"
+        role === "OWNER" ? "bg-amber-500/15 text-amber-500" : "bg-pink-500/15 text-pink-600"
       )}>
         {name.slice(0, 2).toUpperCase()}
       </AvatarFallback>

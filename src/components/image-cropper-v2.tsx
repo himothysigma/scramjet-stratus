@@ -191,7 +191,7 @@ export function ImageCropperV2({
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-zinc-100">
-            <CropIcon className="h-4 w-4 text-emerald-500" />
+            <CropIcon className="h-4 w-4 text-pink-500" />
             {title}
           </DialogTitle>
         </DialogHeader>
@@ -248,7 +248,7 @@ export function ImageCropperV2({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-zinc-300 flex items-center gap-2">
-                <ZoomIn className="h-3.5 w-3.5 text-emerald-500" />
+                <ZoomIn className="h-3.5 w-3.5 text-pink-500" />
                 Zoom
               </Label>
               <span className="text-xs text-zinc-400 tabular-nums">
@@ -268,7 +268,7 @@ export function ImageCropperV2({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-zinc-300 flex items-center gap-2">
-                <RotateCw className="h-3.5 w-3.5 text-emerald-500" />
+                <RotateCw className="h-3.5 w-3.5 text-pink-500" />
                 Rotate
               </Label>
               <span className="text-xs text-zinc-400 tabular-nums">
@@ -290,7 +290,7 @@ export function ImageCropperV2({
             size="sm"
             onClick={reset}
             disabled={busy}
-            className="border-zinc-700/60 text-zinc-300 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/40"
+            className="border-zinc-700/60 text-zinc-300 hover:bg-pink-500/10 hover:text-pink-400 hover:border-pink-500/40"
           >
             <RotateCcw className="h-3.5 w-3.5" />
             Reset
@@ -309,7 +309,7 @@ export function ImageCropperV2({
           <Button
             onClick={confirm}
             disabled={busy || !completed}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white"
+            className="bg-pink-500 hover:bg-pink-600 text-white"
           >
             {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Crop & Save

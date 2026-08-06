@@ -47,13 +47,13 @@ export function AppShell() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "group relative flex flex-col items-center justify-center gap-1 w-11 h-12 rounded-lg transition-colors",
-                  active ? "bg-emerald-500/10 text-emerald-600" : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  active ? "bg-pink-500/10 text-pink-600" : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 )}
               >
                 <Icon className="h-5 w-5" />
                 <span className="text-[10px] font-medium hidden sm:block">{item.label.split(" ")[0]}</span>
                 {active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-0.5 rounded-r bg-emerald-500" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-0.5 rounded-r bg-pink-500" />
                 )}
               </button>
             )
@@ -61,7 +61,7 @@ export function AppShell() {
         </nav>
 
         {/* Panel content */}
-        <main className="flex-1 min-w-0 min-h-0">
+        <main className="flex-1 min-w-0 min-h-0 overflow-hidden">
           {panel === "chat" && <ChatPanel />}
           {panel === "friends" && <FriendsPanel />}
           {panel === "cloud-gaming" && <CloudGamingPanel />}
@@ -74,8 +74,8 @@ export function AppShell() {
       {/* Sticky functional footer — region + status */}
       <footer className="h-8 shrink-0 border-t border-border bg-background flex items-center justify-between px-3 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Region: {region.flag} {region.name}</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-pink-500 animate-pulse" />
+          <span>Region: {region.code} {region.name}</span>
         </div>
         <span className="hidden sm:block">Stratus · everything here actually works</span>
       </footer>

@@ -125,6 +125,8 @@ export function ChatPanel() {
     try {
       await api.muteUser(u.userId)
       toast.success(`${u.displayName} muted`)
+      // Update local presence so the button switches to Unmute immediately
+      setPresence((prev) => prev.map((p) => p.userId === u.userId ? { ...p, muted: true } : p))
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed") }
   }
 
@@ -132,6 +134,8 @@ export function ChatPanel() {
     try {
       await api.unmuteUser(u.userId)
       toast.success(`${u.displayName} unmuted`)
+      // Update local presence so the button switches to Mute immediately
+      setPresence((prev) => prev.map((p) => p.userId === u.userId ? { ...p, muted: false } : p))
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed") }
   }
 
@@ -139,7 +143,7 @@ export function ChatPanel() {
   const activeName = channels.find((c) => c.id === activeChannel)?.name || "general"
 
   return (
-    <div className="h-[calc(100vh-3.5rem-2rem)] flex">
+    <div className="h-full flex">
       {/* Channel list */}
       <aside className="w-52 shrink-0 border-r border-border bg-background flex flex-col">
         <div className="h-11 px-3 flex items-center justify-between border-b border-border">
@@ -151,14 +155,14 @@ export function ChatPanel() {
         {showNewChannel && (
           <div className="p-2 border-b border-border flex gap-1.5">
             <Input value={newChannel} onChange={(e) => setNewChannel(e.target.value)} onKeyDown={(e) => e.key === "Enter" && createChannel()} placeholder="new-channel" className="h-8 text-sm" autoFocus />
-            <Button size="sm" className="h-8 px-2 bg-emerald-500 hover:bg-emerald-600 text-white" onClick={createChannel}>Add</Button>
+            <Button size="sm" className="h-8 px-2 bg-pink-500 hover:bg-pink-600 text-white" onClick={createChannel}>Add</Button>
           </div>
         )}
         <ScrollArea className="flex-1">
           <div className="p-1.5 space-y-0.5">
             {loadingChannels ? <div className="p-2 flex justify-center"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div> :
               channels.map((c) => (
-                <button key={c.id} onClick={() => setActiveChannel(c.id)} className={cn("w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors", activeChannel === c.id ? "bg-emerald-500/10 text-emerald-600" : "hover:bg-accent text-muted-foreground")}>
+                <button key={c.id} onClick={() => setActiveChannel(c.id)} className={cn("w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors", activeChannel === c.id ? "bg-pink-500/10 text-pink-600" : "hover:bg-accent text-muted-foreground")}>
                   <Hash className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{c.name}</span>
                 </button>
               ))
@@ -173,7 +177,7 @@ export function ChatPanel() {
           <div className="flex items-center gap-2 min-w-0">
             <Hash className="h-4 w-4 text-muted-foreground shrink-0" />
             <span className="font-semibold truncate">{activeName}</span>
-            <span className={cn("ml-2 h-2 w-2 rounded-full", connected ? "bg-emerald-500" : "bg-red-500")} />
+            <span className={cn("ml-2 h-2 w-2 rounded-full", connected ? "bg-pink-500" : "bg-red-500")} />
             <span className="text-xs text-muted-foreground">{connected ? "connected" : "reconnecting…"}</span>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Users className="h-3.5 w-3.5" /><span>{presence.length}</span></div>
@@ -194,7 +198,7 @@ export function ChatPanel() {
         <div className="shrink-0 p-3 border-t border-border">
           <div className="flex gap-2">
             <Input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }} placeholder={`Message #${activeName}`} disabled={!connected} className="flex-1" />
-            <Button onClick={send} disabled={!connected || !draft.trim()} className="bg-emerald-500 hover:bg-emerald-600 text-white" size="icon" aria-label="Send"><Send className="h-4 w-4" /></Button>
+            <Button onClick={send} disabled={!connected || !draft.trim()} className="bg-pink-500 hover:bg-pink-600 text-white" size="icon" aria-label="Send"><Send className="h-4 w-4" /></Button>
           </div>
         </div>
       </div>
@@ -210,7 +214,7 @@ export function ChatPanel() {
               <div key={u.userId} className="group flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent">
                 <div className="relative shrink-0">
                   <AvatarWithDeco src={u.pfpUrl} name={u.displayName} role={u.role} avatarDeco={u.avatarDeco} isGif={u.pfpIsGif} size="xs" />
-                  <span className={cn("absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background", u.muted ? "bg-red-500" : "bg-emerald-500")} />
+                  <span className={cn("absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background", u.muted ? "bg-red-500" : "bg-pink-500")} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1">
