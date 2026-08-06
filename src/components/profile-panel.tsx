@@ -11,7 +11,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
 import { ImageCropperV2 } from "@/components/image-cropper-v2"
-import { Camera, Loader2, Check, Crown, Sparkles, Palette, Zap } from "lucide-react"
+import { AccountStats } from "@/components/account-stats"
+import { Camera, Loader2, Check, Crown, Sparkles, Palette, Zap, ShieldCheck } from "lucide-react"
 import { toast } from "sonner"
 import { AVATAR_DECOS, PROFILE_EFFECTS } from "@/lib/constants"
 import { DisplayName, RoleBadge, AvatarWithDeco, ProfileEffectLayer } from "@/components/role-ui"
@@ -26,6 +27,7 @@ export function ProfilePanel() {
   const [savingStatus, setSavingStatus] = useState(false)
   const [savingDeco, setSavingDeco] = useState(false)
   const [uploading, setUploading] = useState<"pfp" | "banner" | null>(null)
+  const [statsOpen, setStatsOpen] = useState(false)
 
   const [cropOpen, setCropOpen] = useState(false)
   const [cropSrc, setCropSrc] = useState<string | null>(null)
@@ -163,6 +165,14 @@ export function ProfilePanel() {
             <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} maxLength={200} rows={3} placeholder="Tell people about yourself" />
             <p className="text-xs text-muted-foreground text-right">{bio.length}/200</p>
           </div>
+          <Button
+            variant="outline"
+            className="w-full gap-2 border-pink-500/30 text-pink-600 hover:bg-pink-500/5 hover:text-pink-600"
+            onClick={() => setStatsOpen(true)}
+          >
+            <ShieldCheck className="h-4 w-4" />
+            Account Standing &amp; Stats
+          </Button>
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
             <div className="flex gap-2">
@@ -218,6 +228,8 @@ export function ProfilePanel() {
       </div>
 
       <ImageCropperV2 open={cropOpen} src={cropSrc} aspect={cropMode === "pfp" ? 1 : 3} circular={cropMode === "pfp"} title={cropMode === "pfp" ? "Crop profile picture" : "Crop banner"} onConfirm={onCropConfirm} onCancel={onCropCancel} />
+
+      <AccountStats open={statsOpen} onOpenChange={setStatsOpen} />
     </div>
   )
 }

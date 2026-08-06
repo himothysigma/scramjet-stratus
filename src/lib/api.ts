@@ -23,6 +23,7 @@ export type Channel = {
   id: string
   name: string
   isDM?: boolean
+  isAnnouncement?: boolean
   _count?: { messages: number }
 }
 
@@ -36,6 +37,8 @@ export type ChatMessage = {
   role?: Role
   content: string
   deleted?: boolean
+  edited?: boolean
+  gifUrl?: string | null
   createdAt: string
 }
 
@@ -116,4 +119,33 @@ export const api = {
   listDMs: () => jsonFetch<{ dms: DM[] }>("/api/dms/list"),
   createDM: (userId: string) =>
     jsonFetch<{ id: string; other: SafeUser }>("/api/dms/list", { method: "POST", body: JSON.stringify({ userId }) }),
+
+  // infractions + account stats
+  listInfractions: (type?: string) =>
+    jsonFetch<{ infractions: any[] }>(`/api/infractions/list${type ? `?type=${type}` : ""}`),
+  warnUser: (userId: string, reason: string) =>
+    jsonFetch(`/api/infractions/create`, { method: "POST", body: JSON.stringify({ userId, type: "WARN", reason }) }),
+  deleteInfraction: (id: string) =>
+    jsonFetch(`/api/infractions/delete`, { method: "DELETE", body: JSON.stringify({ id }) }),
+  getAccountStats: () => jsonFetch(`/api/account/stats`),
+
+  // blocks
+  toggleBlock: (userId: string) =>
+    jsonFetch(`/api/blocks/toggle`, { method: "POST", body: JSON.stringify({ userId }) }),
+  listBlocks: () => jsonFetch(`/api/blocks/list`),
+
+  // games — favorites + history
+  toggleFavorite: (gameId: string) =>
+    jsonFetch(`/api/games/favorite`, { method: "POST", body: JSON.stringify({ gameId }) }),
+  listFavorites: () => jsonFetch(`/api/games/favorites`),
+  recordGamePlay: (gameId: string) =>
+    jsonFetch(`/api/games/history`, { method: "POST", body: JSON.stringify({ gameId }) }),
+  listGameHistory: () => jsonFetch(`/api/games/history`),
+
+  // quotes
+  saveQuote: (authorName: string, content: string, authorPfp?: string) =>
+    jsonFetch(`/api/quotes/save`, { method: "POST", body: JSON.stringify({ authorName, content, authorPfp }) }),
+  listQuotes: () => jsonFetch(`/api/quotes/list`),
+  deleteQuote: (id: string) =>
+    jsonFetch(`/api/quotes/delete`, { method: "DELETE", body: JSON.stringify({ id }) }),
 }

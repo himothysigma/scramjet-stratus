@@ -33,17 +33,20 @@ const insertMessage = sqlite.prepare(`
   VALUES (?, ?, ?, ?, ?, ?)
 `)
 const getChannelMessages = sqlite.prepare(`
-  SELECT m.id, m.channelId, m.userId, m.username, m.content, m.deleted, m.createdAt,
+  SELECT m.id, m.channelId, m.userId, m.username, m.content, m.deleted, m.edited, m.gifUrl, m.createdAt,
          u.displayName, u.pfpUrl, u.pfpIsGif, u.role
   FROM Message m LEFT JOIN User u ON u.id = m.userId
   WHERE m.channelId = ? ORDER BY m.createdAt DESC LIMIT ?
 `)
-const getChannel = sqlite.prepare(`SELECT id, name, isDM FROM Channel WHERE id = ?`)
+const getChannel = sqlite.prepare(`SELECT id, name, isDM, isAnnouncement FROM Channel WHERE id = ?`)
 const getDMMembers = sqlite.prepare(`SELECT userId FROM Membership WHERE channelId = ?`)
 const getUserMute = sqlite.prepare(`SELECT muted, mutedUntil FROM User WHERE id = ?`)
 const markMessageDeleted = sqlite.prepare(`UPDATE Message SET deleted = 1, content = '' WHERE id = ?`)
 const getMessageById = sqlite.prepare(`SELECT id, userId FROM Message WHERE id = ?`)
 const editMessage = sqlite.prepare(`UPDATE Message SET content = ?, edited = 1, editedAt = ? WHERE id = ?`)
+const incrementMessageCount = sqlite.prepare(`UPDATE User SET messageCount = messageCount + 1 WHERE id = ?`)
+const checkBlock = sqlite.prepare(`SELECT 1 FROM Block WHERE blockerId = ? AND blockedId = ?`)
+const insertGifMessage = sqlite.prepare(`INSERT INTO Message (id, channelId, userId, username, content, gifUrl, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)`)
 
 interface SessionRow {
   token: string
@@ -136,8 +139,7 @@ io.on("connection", (socket) => {
 
   socket.on("join-channel", ({ channelId }: { channelId: string }) => {
     if (!channelId) return
-    // For DM channels, verify membership
-    const ch = getChannel.get(channelId) as { id: string; name: string; isDM: number } | null
+    const ch = getChannel.get(channelId) as { id: string; name: string; isDM: number; isAnnouncement: number } | null
     if (ch && ch.isDM === 1) {
       const members = getDMMembers.all(channelId) as { userId: string }[]
       if (!members.some((m) => m.userId === user.userId)) return
@@ -151,7 +153,7 @@ io.on("connection", (socket) => {
       channelId,
       messages: rows.reverse().map((r) => ({
         id: r.id, channelId: r.channelId, userId: r.userId, username: r.username,
-        content: r.content, deleted: r.deleted === 1, createdAt: r.createdAt,
+        content: r.content, deleted: r.deleted === 1, edited: r.edited === 1, gifUrl: r.gifUrl, createdAt: r.createdAt,
         displayName: r.displayName, pfpUrl: r.pfpUrl, pfpIsGif: r.pfpIsGif === 1, role: r.role,
       })),
     })
@@ -164,9 +166,9 @@ io.on("connection", (socket) => {
     broadcastPresence(channelId)
   })
 
-  socket.on("send-message", ({ channelId, content }: { channelId: string; content: string }) => {
+  socket.on("send-message", ({ channelId, content, gifUrl }: { channelId: string; content: string; gifUrl?: string }) => {
     if (!channelId) return
-    // Re-check mute from DB (in case it changed since connect)
+    // Re-check mute from DB
     const fresh = getUserMute.get(user.userId) as { muted: number; mutedUntil: string | null } | null
     if (fresh) {
       user.muted = fresh.muted === 1
@@ -176,17 +178,46 @@ io.on("connection", (socket) => {
       socket.emit("mute-error", { message: "You are muted and can't send messages." })
       return
     }
+
+    // Check channel type
+    const ch = getChannel.get(channelId) as { isDM: number; isAnnouncement: number } | null
+    // Announcement channels: only admin+ can send
+    if (ch && ch.isAnnouncement === 1 && user.role !== "OWNER" && user.role !== "ADMIN" && user.role !== "MOD") {
+      socket.emit("mute-error", { message: "Only moderators can post in announcement channels." })
+      return
+    }
+    // DM channels: check blocks
+    if (ch && ch.isDM === 1) {
+      const members = getDMMembers.all(channelId) as { userId: string }[]
+      const otherId = members.find((m) => m.userId !== user.userId)?.userId
+      if (otherId) {
+        const blocked = checkBlock.get(otherId, user.userId) || checkBlock.get(user.userId, otherId)
+        if (blocked) {
+          socket.emit("mute-error", { message: "You can't message this user." })
+          return
+        }
+      }
+    }
+
     const text = typeof content === "string" ? content.trim() : ""
-    if (text.length === 0 || text.length > 2000) return
+    const hasGif = typeof gifUrl === "string" && gifUrl.length > 0
+    if (text.length === 0 && !hasGif) return
+    if (text.length > 2000) return
 
     const id = genId()
     const createdAt = new Date().toISOString()
-    insertMessage.run(id, channelId, user.userId, user.username, text, createdAt)
+    if (hasGif) {
+      insertGifMessage.run(id, channelId, user.userId, user.username, text, gifUrl, createdAt)
+    } else {
+      insertMessage.run(id, channelId, user.userId, user.username, text, createdAt)
+    }
+    // Increment message count for trusted user system
+    incrementMessageCount.run(user.userId)
 
     io.to(`channel:${channelId}`).emit("message", {
       id, channelId, userId: user.userId, username: user.username,
       displayName: user.displayName, pfpUrl: user.pfpUrl, pfpIsGif: user.pfpIsGif,
-      role: user.role, content: text, deleted: false, createdAt,
+      role: user.role, content: text, gifUrl: hasGif ? gifUrl : null, deleted: false, edited: false, createdAt,
     })
   })
 

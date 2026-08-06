@@ -2,22 +2,33 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { getCurrentUser } from "@/lib/auth"
 
-// GET /api/chat/channels — list public channels only (isDM = false)
+// GET /api/chat/channels — list public channels (not DMs), announcements first
 export async function GET() {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const channels = await db.channel.findMany({
     where: { isDM: false },
-    orderBy: { createdAt: "asc" },
+    orderBy: [{ isAnnouncement: "desc" }, { createdAt: "asc" }],
     include: { _count: { select: { messages: true } } },
   })
 
   if (channels.length === 0) {
     await db.channel.create({ data: { name: "general" } })
+    await db.channel.create({ data: { name: "announcements", isAnnouncement: true } })
     const fresh = await db.channel.findMany({
       where: { isDM: false },
-      orderBy: { createdAt: "asc" },
+      orderBy: [{ isAnnouncement: "desc" }, { createdAt: "asc" }],
+      include: { _count: { select: { messages: true } } },
+    })
+    return NextResponse.json({ channels: fresh })
+  }
+  // Ensure announcements channel exists
+  if (!channels.some((c) => c.isAnnouncement)) {
+    await db.channel.create({ data: { name: "announcements", isAnnouncement: true } })
+    const fresh = await db.channel.findMany({
+      where: { isDM: false },
+      orderBy: [{ isAnnouncement: "desc" }, { createdAt: "asc" }],
       include: { _count: { select: { messages: true } } },
     })
     return NextResponse.json({ channels: fresh })

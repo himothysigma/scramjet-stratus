@@ -1,4 +1,4 @@
-// Scramjet Stratus — schema with roles, DMs, friends, profile effects, moderation
+// Synnical — full schema with infractions, trusted users, blocks, quotes, game favorites
 generator client {
   provider = "prisma-client-js"
 }
@@ -24,14 +24,23 @@ model User {
   role          String    @default("MEMBER")
   muted         Boolean   @default(false)
   mutedUntil    DateTime?
+  warnCount     Int       @default(0)
+  messageCount  Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  sessions         Session[]
-  messages         Message[]
-  memberships      Membership[]
-  sentRequests     Friendship[] @relation("FriendRequester")
-  receivedRequests Friendship[] @relation("FriendReceiver")
+  sessions          Session[]
+  messages          Message[]
+  memberships       Membership[]
+  sentRequests      Friendship[]     @relation("FriendRequester")
+  receivedRequests  Friendship[]     @relation("FriendReceiver")
+  infractionsIssued Infraction[]     @relation("InfractionIssuer")
+  infractionsReceived Infraction[]   @relation("InfractionTarget")
+  blocksInitiated   Block[]          @relation("Blocker")
+  blocksReceived    Block[]          @relation("Blocked")
+  gameFavorites     GameFavorite[]
+  gameHistory       GameHistory[]
+  quotesSaved       Quote[]          @relation("QuoteSaver")
 }
 
 model Session {
@@ -46,27 +55,30 @@ model Session {
 }
 
 model Channel {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  isDM      Boolean   @default(false)
-  createdAt DateTime  @default(now())
+  id             String    @id @default(cuid())
+  name           String    @unique
+  isDM           Boolean   @default(false)
+  isGroup        Boolean   @default(false)
+  isAnnouncement Boolean   @default(false)
+  createdAt      DateTime  @default(now())
 
   messages    Message[]
   memberships Membership[]
 }
 
 model Message {
-  id        String   @id @default(cuid())
-  channelId String
-  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  username  String
-  content   String
-  deleted   Boolean  @default(false)
-  edited    Boolean  @default(false)
-  editedAt  DateTime?
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  channelId  String
+  channel    Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  username   String
+  content    String
+  deleted    Boolean  @default(false)
+  edited     Boolean  @default(false)
+  editedAt   DateTime?
+  gifUrl     String?
+  createdAt  DateTime @default(now())
 
   @@index([channelId, createdAt])
 }
@@ -89,8 +101,65 @@ model Friendship {
   status      String   @default("PENDING")
   createdAt   DateTime @default(now())
   requester   User     @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  receiver   User     @relation("FriendReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("FriendReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
 
   @@unique([requesterId, receiverId])
   @@index([receiverId, status])
+}
+
+model Infraction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("InfractionTarget", fields: [userId], references: [id], onDelete: Cascade)
+  issuerId  String
+  issuer    User     @relation("InfractionIssuer", fields: [issuerId], references: [id], onDelete: Cascade)
+  type      String   // WARN, MUTE, BAN, AUTO_MUTE, AUTO_BAN
+  reason    String
+  duration  Int?     // minutes (null = permanent)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model Block {
+  id         String   @id @default(cuid())
+  blockerId  String
+  blockedId  String
+  blocker    User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked    User     @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+}
+
+model GameFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameId     String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, gameId])
+}
+
+model GameHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameId     String
+  playedAt  DateTime @default(now())
+
+  @@index([userId, playedAt])
+}
+
+model Quote {
+  id         String   @id @default(cuid())
+  saverId    String
+  saver      User     @relation("QuoteSaver", fields: [saverId], references: [id], onDelete: Cascade)
+  authorName String
+  authorPfp  String?
+  content    String
+  createdAt  DateTime @default(now())
+
+  @@index([saverId])
 }

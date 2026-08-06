@@ -25,6 +25,20 @@ export const AVATAR_DECOS = [
   { id: "star-frame", name: "Star Frame" },
 ] as const
 
+// Auto-punishment thresholds (configurable)
+export const AUTO_PUNISHMENTS = {
+  WARN_THRESHOLD_1H_MUTE: 3,    // 3 warns → 1h mute
+  WARN_THRESHOLD_24H_MUTE: 5,   // 5 warns → 24h mute
+  WARN_THRESHOLD_PERM_BAN: 7,   // 7 warns → permanent ban
+}
+
+// Trusted user requirements
+export const TRUSTED_REQUIREMENTS = {
+  MIN_ACCOUNT_AGE_DAYS: 7,
+  MIN_MESSAGES: 1000,
+  NO_INFRACTION_DAYS: 30, // no infractions in last 30 days
+}
+
 // Profile effects (owner-only) — id → label
 export const PROFILE_EFFECTS = [
   { id: "none", name: "None" },

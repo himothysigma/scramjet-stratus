@@ -8,16 +8,19 @@ import { BrowserPanel } from "@/components/browser-panel"
 import { ProfilePanel } from "@/components/profile-panel"
 import { SettingsPanel } from "@/components/settings-panel"
 import { FriendsPanel } from "@/components/friends-panel"
-import { MessageSquare, Gamepad2, Globe, User, Settings, Users } from "lucide-react"
+import { InfractionsPanel } from "@/components/infractions-panel"
+import { MessageSquare, Gamepad2, Globe, User, Settings, Users, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useGaming } from "@/hooks/use-gaming"
+import { useAuth } from "@/hooks/use-auth"
 import { REGIONS } from "@/lib/client-constants"
 
-export type Panel = "chat" | "cloud-gaming" | "browser" | "friends" | "profile" | "settings"
+export type Panel = "chat" | "cloud-gaming" | "browser" | "friends" | "moderation" | "profile" | "settings"
 
-const NAV: { id: Panel; label: string; icon: typeof MessageSquare }[] = [
+const NAV: { id: Panel; label: string; icon: typeof MessageSquare; modOnly?: boolean }[] = [
   { id: "chat", label: "Chat", icon: MessageSquare },
   { id: "friends", label: "Friends", icon: Users },
+  { id: "moderation", label: "Moderation", icon: Shield, modOnly: true },
   { id: "cloud-gaming", label: "Gaming", icon: Gamepad2 },
   { id: "browser", label: "Synnical", icon: Globe },
   { id: "profile", label: "Profile", icon: User },
@@ -27,7 +30,11 @@ const NAV: { id: Panel; label: string; icon: typeof MessageSquare }[] = [
 export function AppShell() {
   const [panel, setPanel] = useState<Panel>("chat")
   const { regionId } = useGaming()
+  const { user } = useAuth()
   const region = REGIONS.find((r) => r.id === regionId) || REGIONS[0]
+
+  const isMod = user?.role === "OWNER" || user?.role === "ADMIN" || user?.role === "MOD"
+  const visibleNav = NAV.filter((item) => !item.modOnly || isMod)
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -36,7 +43,7 @@ export function AppShell() {
       <div className="flex-1 flex min-h-0">
         {/* Icon rail */}
         <nav className="w-14 sm:w-16 shrink-0 border-r border-border bg-background flex flex-col items-center py-3 gap-1">
-          {NAV.map((item) => {
+          {visibleNav.map((item) => {
             const Icon = item.icon
             const active = panel === item.id
             return (
@@ -64,6 +71,7 @@ export function AppShell() {
         <main className="flex-1 min-w-0 min-h-0 overflow-hidden">
           {panel === "chat" && <ChatPanel />}
           {panel === "friends" && <FriendsPanel />}
+          {panel === "moderation" && isMod && <InfractionsPanel />}
           {panel === "cloud-gaming" && <CloudGamingPanel />}
           {panel === "browser" && <BrowserPanel />}
           {panel === "profile" && <ProfilePanel />}
