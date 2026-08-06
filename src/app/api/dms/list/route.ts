@@ -8,7 +8,7 @@ export async function GET() {
   if (!me) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const memberships = await db.membership.findMany({
-    where: { userId: me.id, channel: { isDM: true } },
+    where: { userId: me.id, channel: { OR: [{ isDM: true }, { isGroup: true }] } },
     include: {
       channel: {
         include: {
@@ -32,7 +32,16 @@ export async function GET() {
     })
     .filter((d) => d.other)
 
-  return NextResponse.json({ dms })
+  const groups = memberships
+    .filter((m) => m.channel.isGroup)
+    .map((m) => ({
+      id: m.channel.id,
+      name: m.channel.name.replace(/^group-/, "").replace(/-[a-z0-9]+$/, ""),
+      members: m.channel.memberships.map((mm) => toSafeUser(mm.user)),
+      lastMessage: m.channel.messages[0] || null,
+    }))
+
+  return NextResponse.json({ dms, groups })
 }
 
 // POST /api/dms — create or get a DM channel with a user

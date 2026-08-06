@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   ArrowLeft, ArrowRight, RotateCw, Globe, ExternalLink, Lock, Home,
-  Star, StarOff, Shield, ShieldOff, X, Clock, Search,
+  Star, StarOff, Shield, ShieldOff, X, Clock, Search, Zap, ZapOff, Plus, Check, Settings,
+  ChevronDown, ChevronRight,
 } from "lucide-react"
 import { QUICK_LINKS, SEARCH_ENGINES } from "@/lib/client-constants"
 import { useBrowser, searchEngine } from "@/hooks/use-browser"
@@ -35,12 +36,17 @@ export function BrowserPanel() {
     searchEngineId, setSearchEngine, homepage, setHomepage,
     useProxy, setUseProxy, bookmarks, addBookmark, removeBookmark,
     isBookmarked, recordVisit, history, clearHistory, removeHistory,
+    bookmarksBarCollapsed, setBookmarksBarCollapsed,
+    antiTabClose, setAntiTabClose,
+    imageBlur, setImageBlur,
+    theme, setTheme, renameBookmark,
   } = useBrowser()
 
   const [tabs, setTabs] = useState<Tab[]>([newTab()])
   const [activeId, setActiveId] = useState(tabs[0].id)
   const [loading, setLoading] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
   const active = tabs.find((t) => t.id === activeId) || tabs[0]
@@ -97,6 +103,19 @@ export function BrowserPanel() {
       }
       return next
     })
+  }
+
+  // Anti-tab-close: warn before closing the tab
+  useEffect(() => {
+    if (!antiTabClose) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = "" }
+    window.addEventListener("beforeunload", handler)
+    return () => window.removeEventListener("beforeunload", handler)
+  }, [antiTabClose])
+
+  // Page popout: open current URL in a new browser window
+  const popout = () => {
+    if (active.input) window.open(active.input, "_blank", "width=1280,height=720")
   }
 
   // Listen for navigation messages from proxied pages
@@ -256,6 +275,75 @@ export function BrowserPanel() {
             </div>
           </PopoverContent>
         </Popover>
+
+        {/* Page popout */}
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={popout} disabled={!active.input} aria-label="Pop out">
+          <ExternalLink className="h-4 w-4" />
+        </Button>
+
+        {/* Browser settings (theme, blur, anti-tab-close) */}
+        <Popover open={showSettings} onOpenChange={setShowSettings}>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Browser settings">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-64 p-3 space-y-3">
+            <p className="text-xs font-semibold uppercase text-muted-foreground">Browser Settings</p>
+            {/* Theme picker */}
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground">Theme</p>
+              <div className="grid grid-cols-3 gap-1.5">
+                {([
+                  { id: "synnical", name: "Synnical", color: "#ec4899" },
+                  { id: "blossom", name: "Blossom", color: "#f48fb1" },
+                  { id: "blood", name: "Blood", color: "#ef5350" },
+                ] as const).map((t) => (
+                  <button key={t.id} onClick={() => setTheme(t.id)} className={cn("flex flex-col items-center gap-1 p-2 rounded-md border text-[10px]", theme === t.id ? "border-pink-500 bg-pink-500/10" : "border-border hover:bg-accent")}>
+                    <span className="h-4 w-4 rounded-full" style={{ background: t.color }} />
+                    {t.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Image blur toggle */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs">Image blur</span>
+              <button onClick={() => setImageBlur(!imageBlur)} className={cn("h-5 w-9 rounded-full transition-colors relative", imageBlur ? "bg-pink-500" : "bg-muted")}>
+                <span className={cn("absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform", imageBlur ? "translate-x-4" : "translate-x-0.5")} />
+              </button>
+            </div>
+            {/* Anti-tab-close toggle */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs">Anti tab close</span>
+              <button onClick={() => setAntiTabClose(!antiTabClose)} className={cn("h-5 w-9 rounded-full transition-colors relative", antiTabClose ? "bg-pink-500" : "bg-muted")}>
+                <span className={cn("absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform", antiTabClose ? "translate-x-4" : "translate-x-0.5")} />
+              </button>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Collapsible bookmarks bar */}
+      <div className="h-7 shrink-0 flex items-center gap-1 px-1 border-b border-[#2a2a2a] bg-[#0d0d0d]">
+        <button onClick={() => setBookmarksBarCollapsed(!bookmarksBarCollapsed)} className="text-gray-500 hover:text-white p-1 shrink-0" aria-label="Toggle bookmarks bar">
+          {bookmarksBarCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+        </button>
+        {!bookmarksBarCollapsed && (
+          <div className="flex items-center gap-1 overflow-x-auto custom-scroll flex-1">
+            {bookmarks.length === 0 ? (
+              <span className="text-[10px] text-gray-600 px-1">No bookmarks yet</span>
+            ) : bookmarks.map((b) => (
+              <button key={b.id} onClick={() => navigate(b.url)} className="flex items-center gap-1 text-xs px-2 py-0.5 rounded hover:bg-[#1a1a1a] whitespace-nowrap text-gray-400 hover:text-white group">
+                <img src={`https://www.google.com/s2/favicons?domain=${(() => { try { return new URL(b.url).hostname } catch { return "" } })()}&sz=32`} alt="" className="h-3 w-3" />
+                <span>{b.title}</span>
+                <span onClick={(e) => { e.stopPropagation(); removeBookmark(b.id) }} className="opacity-0 group-hover:opacity-100 hover:text-red-400 cursor-pointer">
+                  <X className="h-2.5 w-2.5" />
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Viewport */}
@@ -275,6 +363,7 @@ export function BrowserPanel() {
               src={active.url}
               title={active.title}
               className="w-full h-full border-none bg-white"
+              style={{ border: "none", filter: imageBlur ? "blur(8px)" : "none" }}
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-modals"
               referrerPolicy="no-referrer"
               onLoad={() => setLoading(false)}

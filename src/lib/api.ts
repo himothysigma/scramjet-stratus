@@ -116,9 +116,11 @@ export const api = {
     jsonFetch<{ ok: true }>("/api/friends/decline", { method: "POST", body: JSON.stringify({ requesterId }) }),
   removeFriend: (userId: string) =>
     jsonFetch<{ ok: true }>("/api/friends/remove", { method: "POST", body: JSON.stringify({ userId }) }),
-  listDMs: () => jsonFetch<{ dms: DM[] }>("/api/dms/list"),
+  listDMs: () => jsonFetch<{ dms: DM[]; groups: any[] }>("/api/dms/list"),
   createDM: (userId: string) =>
     jsonFetch<{ id: string; other: SafeUser }>("/api/dms/list", { method: "POST", body: JSON.stringify({ userId }) }),
+  createGroup: (name: string, memberIds: string[]) =>
+    jsonFetch<{ id: string; name: string; members: SafeUser[] }>("/api/channels/group", { method: "POST", body: JSON.stringify({ name, memberIds }) }),
 
   // infractions + account stats
   listInfractions: (type?: string) =>

@@ -1,16 +1,22 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import type { ReactNode } from "react"
 import { GAMES, GAME_SOURCES, type GameDef, type GameSource } from "@/lib/client-constants"
 import { useGaming } from "@/hooks/use-gaming"
+import { api } from "@/lib/api"
 import { Button } from "@/components/ui/button"
-import { Gamepad2, Maximize2, ArrowLeft, Gauge, Globe, Play, Cloud } from "lucide-react"
+import { Gamepad2, Maximize2, ArrowLeft, Gauge, Globe, Play, Cloud, Star, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+type Tab = "local" | "cloud" | "favorites" | "recent"
 
 export function CloudGamingPanel() {
   const [active, setActive] = useState<GameDef | null>(null)
   const [cloudSource, setCloudSource] = useState<GameSource | null>(null)
-  const [tab, setTab] = useState<"local" | "cloud">("local")
+  const [tab, setTab] = useState<Tab>("local")
+  const [favorites, setFavorites] = useState<string[]>([])
+  const [history, setHistory] = useState<string[]>([])
   const { quality, region } = useGaming()
   const frameWrapRef = useRef<HTMLDivElement>(null)
 
@@ -21,11 +27,46 @@ export function CloudGamingPanel() {
     region().id.startsWith("us") ? 86 :
     region().id.startsWith("ap") ? 142 : 40
 
+  // Load favorites + history on mount
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([
+      api.listFavorites().catch(() => ({ favorites: [] as string[] })),
+      api.listGameHistory().catch(() => ({ history: [] as string[] })),
+    ]).then(([fav, hist]) => {
+      if (cancelled) return
+      setFavorites(fav.favorites ?? [])
+      setHistory(hist.history ?? [])
+    })
+    return () => { cancelled = true }
+  }, [])
+
   const goFullscreen = () => {
     const el = frameWrapRef.current
     if (!el) return
     if (document.fullscreenElement) document.exitFullscreen()
     else el.requestFullscreen?.()
+  }
+
+  const isFav = (id: string) => favorites.includes(id)
+
+  const toggleFavorite = async (gameId: string) => {
+    const wasFav = favorites.includes(gameId)
+    // Optimistic local update — feels instant
+    setFavorites(prev => wasFav ? prev.filter(x => x !== gameId) : [...prev, gameId])
+    try {
+      await api.toggleFavorite(gameId)
+    } catch {
+      // Revert on failure
+      setFavorites(prev => wasFav ? [...prev, gameId] : prev.filter(x => x !== gameId))
+    }
+  }
+
+  const launchGame = (g: GameDef) => {
+    setActive(g)
+    // Record play session (fire-and-forget; update local history optimistically)
+    api.recordGamePlay(g.id).catch(() => {})
+    setHistory(prev => [g.id, ...prev.filter(x => x !== g.id)].slice(0, 10))
   }
 
   if (active) {
@@ -105,6 +146,85 @@ export function CloudGamingPanel() {
     )
   }
 
+  // Render a single game card with a favorite star overlay.
+  // Uses a div+role instead of a <button> so the star button can nest inside.
+  const renderGameCard = (g: GameDef) => {
+    const fav = isFav(g.id)
+    return (
+      <div
+        key={g.id}
+        role="button"
+        tabIndex={0}
+        onClick={() => launchGame(g)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            launchGame(g)
+          }
+        }}
+        className="group relative text-left rounded-xl border border-border bg-card hover:border-pink-500/40 hover:shadow-lg transition-all overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/50"
+      >
+        <div className="aspect-[16/10] relative overflow-hidden bg-muted">
+          <img src={g.cover} alt={`${g.name} cover`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+          {/* Favorite star — top-left, over the cover image */}
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); e.preventDefault(); void toggleFavorite(g.id) }}
+            aria-label={fav ? `Remove ${g.name} from favorites` : `Add ${g.name} to favorites`}
+            aria-pressed={fav}
+            className="absolute top-2 left-2 z-10 rounded p-1 bg-black/70 backdrop-blur hover:bg-black/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/60"
+          >
+            <Star
+              className={cn(
+                "h-3.5 w-3.5 transition-colors",
+                fav ? "fill-pink-500 text-pink-500" : "text-white/80 hover:text-pink-400"
+              )}
+            />
+          </button>
+          <span className="absolute top-2 right-2 text-[10px] font-medium px-1.5 py-0.5 rounded bg-black/70 backdrop-blur text-white">{g.category}</span>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+            <span className="flex items-center gap-1 text-xs font-medium text-white"><Play className="h-3 w-3 fill-white" /> Play now</span>
+          </div>
+        </div>
+        <div className="p-3">
+          <h3 className="font-semibold text-sm truncate">{g.name}</h3>
+          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{g.description}</p>
+          <p className="text-[10px] text-muted-foreground/70 mt-1">{g.controls}</p>
+        </div>
+      </div>
+    )
+  }
+
+  const renderEmpty = (message: string, icon: ReactNode) => (
+    <div className="flex flex-col items-center justify-center text-center py-16 px-4 border border-dashed border-border rounded-xl">
+      <div className="h-12 w-12 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-3 text-pink-500">
+        {icon}
+      </div>
+      <p className="text-sm text-muted-foreground max-w-xs">{message}</p>
+    </div>
+  )
+
+  const favoriteGames = GAMES.filter(g => favorites.includes(g.id))
+  const recentGames: GameDef[] = history
+    .map(id => GAMES.find(g => g.id === id))
+    .filter((g): g is GameDef => g !== undefined)
+
+  const tabBtn = (id: Tab, label: string, icon: ReactNode, count?: number) => (
+    <button
+      onClick={() => setTab(id)}
+      className={cn(
+        "px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap inline-flex items-center",
+        tab === id ? "border-pink-500 text-pink-500" : "border-transparent text-muted-foreground hover:text-foreground"
+      )}
+    >
+      {icon}
+      {label}
+      {count !== undefined && count > 0 && (
+        <span className="ml-1.5 text-[10px] font-semibold bg-pink-500/15 text-pink-500 px-1.5 py-0.5 rounded-full">{count}</span>
+      )}
+    </button>
+  )
+
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-5 sm:p-6 max-w-5xl mx-auto">
@@ -120,45 +240,26 @@ export function CloudGamingPanel() {
           </div>
         </div>
 
-        {/* Tabs: Local Games / Cloud Games */}
-        <div className="flex gap-1 mt-4 mb-5 border-b border-border">
-          <button onClick={() => setTab("local")} className={cn("px-4 py-2 text-sm font-medium border-b-2 transition-colors", tab === "local" ? "border-pink-500 text-pink-500" : "border-transparent text-muted-foreground hover:text-foreground")}>
-            <Gamepad2 className="h-4 w-4 inline mr-1.5" />Local Games
-          </button>
-          <button onClick={() => setTab("cloud")} className={cn("px-4 py-2 text-sm font-medium border-b-2 transition-colors", tab === "cloud" ? "border-pink-500 text-pink-500" : "border-transparent text-muted-foreground hover:text-foreground")}>
-            <Cloud className="h-4 w-4 inline mr-1.5" />Cloud Games
-          </button>
+        {/* Tabs: Local Games / Cloud Games / Favorites / Recent */}
+        <div className="flex gap-1 mt-4 mb-5 border-b border-border overflow-x-auto">
+          {tabBtn("local", "Local Games", <Gamepad2 className="h-4 w-4 mr-1.5" />)}
+          {tabBtn("cloud", "Cloud Games", <Cloud className="h-4 w-4 mr-1.5" />)}
+          {tabBtn("favorites", "Favorites", <Star className="h-4 w-4 mr-1.5" />, favorites.length)}
+          {tabBtn("recent", "Recent", <Clock className="h-4 w-4 mr-1.5" />, history.length)}
         </div>
 
-        {tab === "local" ? (
+        {tab === "local" && (
           <>
             <p className="text-sm text-muted-foreground mb-5">
               8 real playable games — no external requests, run directly in your browser.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {GAMES.map((g) => (
-                <button
-                  key={g.id}
-                  onClick={() => setActive(g)}
-                  className="group text-left rounded-xl border border-border bg-card hover:border-pink-500/40 hover:shadow-lg transition-all overflow-hidden"
-                >
-                  <div className="aspect-[16/10] relative overflow-hidden bg-muted">
-                    <img src={g.cover} alt={`${g.name} cover`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-                    <span className="absolute top-2 right-2 text-[10px] font-medium px-1.5 py-0.5 rounded bg-black/70 backdrop-blur text-white">{g.category}</span>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
-                      <span className="flex items-center gap-1 text-xs font-medium text-white"><Play className="h-3 w-3 fill-white" /> Play now</span>
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <h3 className="font-semibold text-sm truncate">{g.name}</h3>
-                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{g.description}</p>
-                    <p className="text-[10px] text-muted-foreground/70 mt-1">{g.controls}</p>
-                  </div>
-                </button>
-              ))}
+              {GAMES.map(renderGameCard)}
             </div>
           </>
-        ) : (
+        )}
+
+        {tab === "cloud" && (
           <>
             <p className="text-sm text-muted-foreground mb-5">
               Stream AAA + browser games from external cloud platforms. These load in an iframe — some may require a stable connection.
@@ -179,6 +280,36 @@ export function CloudGamingPanel() {
                 </button>
               ))}
             </div>
+          </>
+        )}
+
+        {tab === "favorites" && (
+          <>
+            <p className="text-sm text-muted-foreground mb-5">
+              Your starred games, ready to launch in one click.
+            </p>
+            {favoriteGames.length === 0 ? (
+              renderEmpty("No favorites yet. Click the star on a game to add it.", <Star className="h-5 w-5" />)
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {favoriteGames.map(renderGameCard)}
+              </div>
+            )}
+          </>
+        )}
+
+        {tab === "recent" && (
+          <>
+            <p className="text-sm text-muted-foreground mb-5">
+              Pick up where you left off — your last played games.
+            </p>
+            {recentGames.length === 0 ? (
+              renderEmpty("No games played yet.", <Clock className="h-5 w-5" />)
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {recentGames.map(renderGameCard)}
+              </div>
+            )}
           </>
         )}
       </div>

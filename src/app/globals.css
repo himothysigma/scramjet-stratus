@@ -157,6 +157,20 @@
 .synnical-border { border-color: #ec4899 !important; }
 .synnical-input { background: #1a1a1a !important; border-color: #333 !important; color: #f0f0f0 !important; }
 .synnical-input:focus { border-color: #ec4899 !important; box-shadow: 0 0 0 2px rgba(236,72,153,0.3) !important; }
+
+/* Blossom theme (pink + white, softer) */
+.blossom-bg { background: #1a0a14 !important; color: #fce4ec; }
+.blossom-accent { color: #f48fb1; }
+.blossom-accent-bg { background: #f48fb1; }
+.blossom-input { background: #2a1520 !important; border-color: #4a2535 !important; color: #fce4ec !important; }
+.blossom-input:focus { border-color: #f48fb1 !important; }
+
+/* Blood theme (dark red + crimson) */
+.blood-bg { background: #0a0000 !important; color: #ffcdd2; }
+.blood-accent { color: #ef5350; }
+.blood-accent-bg { background: #ef5350; }
+.blood-input { background: #1a0505 !important; border-color: #3a0a0a !important; color: #ffcdd2 !important; }
+.blood-input:focus { border-color: #ef5350 !important; }
 .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
 .custom-scroll::-webkit-scrollbar-track { background: transparent; }
 .custom-scroll::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.3); border-radius: 3px; }
