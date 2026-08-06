@@ -145,11 +145,11 @@ export function BrowserPanel() {
               t.id === activeId ? "bg-[#1a1a1a] border border-[#ec4899]/40" : "hover:bg-[#1a1a1a]/60"
             )}
           >
-            <Globe className="h-3 w-3 text-muted-foreground shrink-0" />
+            <Globe className="h-3 w-3 text-[#888888] shrink-0" />
             <span className="truncate flex-1">{t.input || "New Tab"}</span>
             <button
               onClick={(e) => { e.stopPropagation(); closeTab(t.id) }}
-              className="opacity-0 group-hover:opacity-100 hover:bg-muted rounded p-0.5"
+              className="opacity-0 group-hover:opacity-100 hover:bg-[#1a1a1a] rounded p-0.5"
               aria-label="Close tab"
             >
               <X className="h-3 w-3" />
@@ -173,7 +173,7 @@ export function BrowserPanel() {
               <button
                 key={s.id}
                 onClick={() => setSearchEngine(s.id)}
-                className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent"
+                className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-[#1a1a1a]"
               >
                 <span>{s.icon}</span><span className="flex-1 text-left">{s.name}</span>
                 {searchEngineId === s.id && <span className="synnical-accent">✓</span>}
@@ -188,7 +188,7 @@ export function BrowserPanel() {
           onClick={() => setUseProxy(!useProxy)}
           title={useProxy ? "Proxy ON — bypasses anti-iframe blocks" : "Proxy OFF — direct iframe"}
         >
-          {useProxy ? <Shield className="h-3.5 w-3.5 synnical-accent" /> : <ShieldOff className="h-3.5 w-3.5 text-muted-foreground" />}
+          {useProxy ? <Shield className="h-3.5 w-3.5 synnical-accent" /> : <ShieldOff className="h-3.5 w-3.5 text-[#888888]" />}
           {useProxy ? "Proxy" : "Direct"}
         </Button>
       </div>
@@ -229,16 +229,16 @@ export function BrowserPanel() {
                 <button
                   type="button"
                   onClick={() => bookmarked ? removeBookmark(bookmarks.find((b) => b.url === active.input)!.id) : addBookmark({ title: active.input, url: active.input })}
-                  className="p-1 rounded hover:bg-accent text-muted-foreground"
+                  className="p-1 rounded hover:bg-[#1a1a1a] text-[#888888]"
                   aria-label={bookmarked ? "Remove bookmark" : "Add bookmark"}
                 >
-                  {bookmarked ? <Star className="h-3.5 w-3.5 synnical-accent" /> : <StarOff className="h-3.5 w-3.5 text-muted-foreground" />}
+                  {bookmarked ? <Star className="h-3.5 w-3.5 synnical-accent" /> : <StarOff className="h-3.5 w-3.5 text-[#888888]" />}
                 </button>
               )}
               {active.input && (
                 <a
                   href={active.input} target="_blank" rel="noreferrer"
-                  className="p-1 rounded hover:bg-accent text-muted-foreground"
+                  className="p-1 rounded hover:bg-[#1a1a1a] text-[#888888]"
                   aria-label="Open in new tab"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
@@ -254,20 +254,20 @@ export function BrowserPanel() {
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-80 p-0">
-            <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-              <span className="text-xs font-semibold uppercase text-muted-foreground">History</span>
+            <div className="flex items-center justify-between px-3 py-2 border-b border-[#2a2a2a]">
+              <span className="text-xs font-semibold uppercase text-[#888888]">History</span>
               <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={clearHistory}>Clear</Button>
             </div>
             <div className="max-h-72 overflow-y-auto">
               {history.length === 0 ? (
-                <p className="p-3 text-xs text-muted-foreground text-center">No history yet</p>
+                <p className="p-3 text-xs text-[#888888] text-center">No history yet</p>
               ) : history.map((h) => (
-                <div key={h.id} className="group flex items-center gap-2 px-3 py-1.5 hover:bg-accent">
+                <div key={h.id} className="group flex items-center gap-2 px-3 py-1.5 hover:bg-[#1a1a1a]">
                   <button className="flex-1 min-w-0 text-left" onClick={() => { navigate(h.url); setShowHistory(false) }}>
                     <p className="text-xs truncate">{h.title}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{h.url}</p>
+                    <p className="text-[10px] text-[#888888] truncate">{h.url}</p>
                   </button>
-                  <button onClick={() => removeHistory(h.id)} className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded">
+                  <button onClick={() => removeHistory(h.id)} className="opacity-0 group-hover:opacity-100 p-1 hover:bg-[#1a1a1a] rounded">
                     <X className="h-3 w-3" />
                   </button>
                 </div>
@@ -289,17 +289,17 @@ export function BrowserPanel() {
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-64 p-3 space-y-3">
-            <p className="text-xs font-semibold uppercase text-muted-foreground">Browser Settings</p>
+            <p className="text-xs font-semibold uppercase text-[#888888]">Browser Settings</p>
             {/* Theme picker */}
             <div className="space-y-1.5">
-              <p className="text-xs text-muted-foreground">Theme</p>
+              <p className="text-xs text-[#888888]">Theme</p>
               <div className="grid grid-cols-3 gap-1.5">
                 {([
                   { id: "synnical", name: "Synnical", color: "#ec4899" },
                   { id: "blossom", name: "Blossom", color: "#f48fb1" },
                   { id: "blood", name: "Blood", color: "#ef5350" },
                 ] as const).map((t) => (
-                  <button key={t.id} onClick={() => setTheme(t.id)} className={cn("flex flex-col items-center gap-1 p-2 rounded-md border text-[10px]", theme === t.id ? "border-pink-500 bg-pink-500/10" : "border-border hover:bg-accent")}>
+                  <button key={t.id} onClick={() => setTheme(t.id)} className={cn("flex flex-col items-center gap-1 p-2 rounded-md border text-[10px]", theme === t.id ? "border-pink-500 bg-pink-500/10" : "border-[#2a2a2a] hover:bg-[#1a1a1a]")}>
                     <span className="h-4 w-4 rounded-full" style={{ background: t.color }} />
                     {t.name}
                   </button>
@@ -309,14 +309,14 @@ export function BrowserPanel() {
             {/* Image blur toggle */}
             <div className="flex items-center justify-between">
               <span className="text-xs">Image blur</span>
-              <button onClick={() => setImageBlur(!imageBlur)} className={cn("h-5 w-9 rounded-full transition-colors relative", imageBlur ? "bg-pink-500" : "bg-muted")}>
+              <button onClick={() => setImageBlur(!imageBlur)} className={cn("h-5 w-9 rounded-full transition-colors relative", imageBlur ? "bg-pink-500" : "bg-[#1a1a1a]")}>
                 <span className={cn("absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform", imageBlur ? "translate-x-4" : "translate-x-0.5")} />
               </button>
             </div>
             {/* Anti-tab-close toggle */}
             <div className="flex items-center justify-between">
               <span className="text-xs">Anti tab close</span>
-              <button onClick={() => setAntiTabClose(!antiTabClose)} className={cn("h-5 w-9 rounded-full transition-colors relative", antiTabClose ? "bg-pink-500" : "bg-muted")}>
+              <button onClick={() => setAntiTabClose(!antiTabClose)} className={cn("h-5 w-9 rounded-full transition-colors relative", antiTabClose ? "bg-pink-500" : "bg-[#1a1a1a]")}>
                 <span className={cn("absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform", antiTabClose ? "translate-x-4" : "translate-x-0.5")} />
               </button>
             </div>
@@ -369,7 +369,7 @@ export function BrowserPanel() {
               onLoad={() => setLoading(false)}
             />
             {loading && (
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 text-xs bg-background/90 backdrop-blur px-3 py-1 rounded-full border border-border text-muted-foreground shadow">
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 text-xs bg-[#0a0a0a]/90 backdrop-blur px-3 py-1 rounded-full border border-[#2a2a2a] text-[#888888] shadow">
                 Loading{useProxy ? " via proxy" : ""}…
               </div>
             )}
@@ -404,7 +404,7 @@ function NewTabPage({
           onSubmit={(e) => { e.preventDefault(); onNavigate(query) }}
         >
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#888888]" />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -416,7 +416,7 @@ function NewTabPage({
         </form>
 
         <div className="w-full mt-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Quick links</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#888888] mb-3">Quick links</p>
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {QUICK_LINKS.map((q) => (
               <button
@@ -433,17 +433,17 @@ function NewTabPage({
 
         {bookmarks.length > 0 && (
           <div className="w-full mt-8">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Bookmarks</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#888888] mb-3">Bookmarks</p>
             <div className="space-y-1">
               {bookmarks.map((b) => (
                 <button
                   key={b.id}
                   onClick={() => onNavigate(b.url)}
-                  className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-accent text-left"
+                  className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-[#1a1a1a] text-left"
                 >
                   <Star className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                   <span className="text-sm truncate flex-1">{b.title}</span>
-                  <span className="text-[10px] text-muted-foreground truncate">{b.url}</span>
+                  <span className="text-[10px] text-[#888888] truncate">{b.url}</span>
                 </button>
               ))}
             </div>
@@ -451,7 +451,7 @@ function NewTabPage({
         )}
 
         <div className="w-full mt-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Homepage</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#888888] mb-2">Homepage</p>
           <div className="flex gap-2">
             <Input
               value={homepage}

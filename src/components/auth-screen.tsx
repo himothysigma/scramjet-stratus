@@ -31,15 +31,15 @@ export function AuthScreen() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <div className="flex flex-col items-center mb-8">
             <div className="h-14 w-14 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-3">
               <Cloud className="h-7 w-7 text-pink-500" />
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight">Stratus</h1>
-            <p className="text-sm text-muted-foreground mt-1">Cloud gaming, chat & browser</p>
+            <h1 className="text-2xl font-semibold tracking-tight">Synnical</h1>
+            <p className="text-sm text-[#888888] mt-1">Cloud gaming, chat & browser</p>
           </div>
 
           <form onSubmit={submit} className="space-y-4">
@@ -74,7 +74,7 @@ export function AuthScreen() {
             </Button>
           </form>
 
-          <div className="mt-4 text-center text-sm text-muted-foreground">
+          <div className="mt-4 text-center text-sm text-[#888888]">
             {mode === "login" ? "No account yet?" : "Already have an account?"}{" "}
             <button
               type="button"

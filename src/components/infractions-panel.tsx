@@ -159,9 +159,9 @@ export function InfractionsPanel() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-background">
+    <div className="h-full flex flex-col bg-[#0a0a0a]">
       {/* Header */}
-      <div className="shrink-0 px-4 h-11 flex items-center gap-2 border-b border-border">
+      <div className="shrink-0 px-4 h-11 flex items-center gap-2 border-b border-[#2a2a2a]">
         <Shield className="h-4 w-4 text-pink-500" />
         <span className="font-semibold">Moderation</span>
         <Badge variant="outline" className="ml-1 border-pink-500/40 text-pink-500">
@@ -169,7 +169,7 @@ export function InfractionsPanel() {
           {user.role === "OWNER" ? "Owner" : user.role === "ADMIN" ? "Admin" : "Mod"}
         </Badge>
         <div className="flex-1" />
-        <span className="text-xs text-muted-foreground hidden sm:block">
+        <span className="text-xs text-[#888888] hidden sm:block">
           {infractions.length} record{infractions.length === 1 ? "" : "s"}
         </span>
       </div>
@@ -182,7 +182,7 @@ export function InfractionsPanel() {
               <Sparkles className="h-4 w-4 text-pink-500" />
               <h2 className="text-sm font-semibold text-pink-600">Auto-Punishment Thresholds</h2>
             </div>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-xs text-[#888888] mb-3">
               Warnings accumulate on a user&apos;s account. When thresholds are crossed, automatic
               punishments are applied.
             </p>
@@ -206,7 +206,7 @@ export function InfractionsPanel() {
           </section>
 
           {/* Warn user */}
-          <section className="rounded-xl border border-border p-4 space-y-3">
+          <section className="rounded-xl border border-[#2a2a2a] p-4 space-y-3">
             <div className="flex items-center gap-2">
               <Gavel className="h-4 w-4 text-pink-500" />
               <h2 className="text-sm font-semibold">Warn a user</h2>
@@ -216,7 +216,7 @@ export function InfractionsPanel() {
               <div className="space-y-1.5">
                 <Label htmlFor="warn-search" className="text-xs">Search user</Label>
                 <div className="relative">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#888888]" />
                   <Input
                     id="warn-search"
                     value={search}
@@ -238,7 +238,7 @@ export function InfractionsPanel() {
                         <SelectItem key={u.id} value={u.id} disabled={u.id === user.id}>
                           <span className="flex items-center gap-2">
                             <span>{u.displayName}</span>
-                            <span className="text-muted-foreground text-xs">@{u.username}</span>
+                            <span className="text-[#888888] text-xs">@{u.username}</span>
                             {u.warnCount > 0 && (
                               <span className="ml-1 text-[10px] bg-amber-500/15 text-amber-500 px-1 rounded">
                                 {u.warnCount}w
@@ -278,10 +278,10 @@ export function InfractionsPanel() {
           </section>
 
           {/* Infractions table */}
-          <section className="rounded-xl border border-border overflow-hidden">
+          <section className="rounded-xl border border-[#2a2a2a] overflow-hidden">
             <Tabs value={tab} onValueChange={setTab}>
-              <div className="p-2 border-b border-border overflow-x-auto">
-                <TabsList className="bg-muted/50">
+              <div className="p-2 border-b border-[#2a2a2a] overflow-x-auto">
+                <TabsList className="bg-[#1a1a1a]/50">
                   {TYPE_TABS.map((t) => (
                     <TabsTrigger key={t.id} value={t.id} className="text-xs">
                       {t.label}
@@ -294,16 +294,16 @@ export function InfractionsPanel() {
             <div className="max-h-[420px] overflow-y-auto custom-scroll">
               {loading ? (
                 <div className="p-8 flex justify-center">
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  <Loader2 className="h-5 w-5 animate-spin text-[#888888]" />
                 </div>
               ) : infractions.length === 0 ? (
-                <div className="p-8 text-center text-sm text-muted-foreground">
-                  <Shield className="h-8 w-8 mx-auto mb-2 text-muted-foreground/40" />
+                <div className="p-8 text-center text-sm text-[#888888]">
+                  <Shield className="h-8 w-8 mx-auto mb-2 text-[#888888]/40" />
                   No infractions in this view.
                 </div>
               ) : (
                 <table className="w-full text-sm">
-                  <thead className="sticky top-0 bg-muted/60 backdrop-blur text-xs uppercase text-muted-foreground">
+                  <thead className="sticky top-0 bg-[#1a1a1a]/60 backdrop-blur text-xs uppercase text-[#888888]">
                     <tr>
                       <th className="text-left font-medium px-3 py-2">User</th>
                       <th className="text-left font-medium px-3 py-2 hidden sm:table-cell">Type</th>
@@ -318,7 +318,7 @@ export function InfractionsPanel() {
                       const cfg = TYPE_CONFIG[inf.type] || TYPE_CONFIG.WARN
                       const { Icon } = cfg
                       return (
-                        <tr key={inf.id} className="border-t border-border hover:bg-accent/40 align-top">
+                        <tr key={inf.id} className="border-t border-[#2a2a2a] hover:bg-[#1a1a1a]/40 align-top">
                           <td className="px-3 py-2.5">
                             <div className="flex items-center gap-2 min-w-0">
                               <AvatarWithDeco
@@ -339,7 +339,7 @@ export function InfractionsPanel() {
                                     <RoleBadge role={inf.user.role} />
                                   )}
                                 </div>
-                                <p className="text-xs text-muted-foreground truncate">
+                                <p className="text-xs text-[#888888] truncate">
                                   @{inf.user?.username || "unknown"}
                                 </p>
                               </div>
@@ -351,13 +351,13 @@ export function InfractionsPanel() {
                               {cfg.label}
                             </span>
                             {inf.duration !== null && (
-                              <p className="text-[10px] text-muted-foreground mt-1">
+                              <p className="text-[10px] text-[#888888] mt-1">
                                 {formatDuration(inf.duration)}
                               </p>
                             )}
                           </td>
                           <td className="px-3 py-2.5">
-                            <p className="text-sm text-foreground/90 break-words line-clamp-2">{inf.reason}</p>
+                            <p className="text-sm text-[#f0f0f0]/90 break-words line-clamp-2">{inf.reason}</p>
                             <span className={cn("sm:hidden inline-flex items-center gap-1 text-[10px] font-semibold uppercase mt-1 px-1.5 py-0.5 rounded border", cfg.cls)}>
                               <Icon className="h-2.5 w-2.5" />{cfg.label}
                             </span>
@@ -377,13 +377,13 @@ export function InfractionsPanel() {
                                   role={(inf.issuer?.role || "MEMBER") as SafeUser["role"]}
                                   className="text-xs truncate"
                                 />
-                                <p className="text-[10px] text-muted-foreground truncate">
+                                <p className="text-[10px] text-[#888888] truncate">
                                   @{inf.issuer?.username || "system"}
                                 </p>
                               </div>
                             </div>
                           </td>
-                          <td className="px-3 py-2.5 hidden lg:table-cell text-xs text-muted-foreground whitespace-nowrap">
+                          <td className="px-3 py-2.5 hidden lg:table-cell text-xs text-[#888888] whitespace-nowrap">
                             {formatRelative(inf.createdAt)}
                           </td>
                           {canDelete && (
@@ -428,14 +428,14 @@ function ThresholdCard({
   Icon: typeof AlertTriangle
 }) {
   return (
-    <div className="rounded-lg border border-pink-500/20 bg-background/60 p-3 flex items-center gap-3">
+    <div className="rounded-lg border border-pink-500/20 bg-[#0a0a0a]/60 p-3 flex items-center gap-3">
       <div className="h-9 w-9 rounded-lg bg-pink-500/15 text-pink-500 flex items-center justify-center shrink-0">
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0">
-        <p className="text-xs text-muted-foreground">At</p>
+        <p className="text-xs text-[#888888]">At</p>
         <p className="text-sm font-semibold leading-tight">
-          {count} <span className="text-muted-foreground font-normal">warns</span>
+          {count} <span className="text-[#888888] font-normal">warns</span>
         </p>
         <p className="text-xs text-pink-600">{label}</p>
       </div>

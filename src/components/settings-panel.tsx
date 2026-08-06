@@ -71,28 +71,28 @@ export function SettingsPanel() {
       <div className="max-w-xl mx-auto p-4 sm:p-6 space-y-6">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
-          <p className="text-sm text-muted-foreground">Account, ownership & moderation.</p>
+          <p className="text-sm text-[#888888]">Account, ownership & moderation.</p>
         </div>
 
         {/* Account */}
-        <section className="rounded-xl border border-border p-4">
+        <section className="rounded-xl border border-[#2a2a2a] p-4">
           <h2 className="text-sm font-semibold mb-3">Account</h2>
           <div className="flex items-center justify-between">
             <div>
               <DisplayName name={user.displayName} role={user.role} className="text-sm font-medium" />
-              <p className="text-xs text-muted-foreground">@{user.username}</p>
+              <p className="text-xs text-[#888888]">@{user.username}</p>
             </div>
-            {user.role !== "MEMBER" ? <RoleBadge role={user.role} /> : <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted rounded-full px-2.5 py-1"><Shield className="h-3.5 w-3.5" />Member</span>}
+            {user.role !== "MEMBER" ? <RoleBadge role={user.role} /> : <span className="inline-flex items-center gap-1 text-xs text-[#888888] bg-[#1a1a1a] rounded-full px-2.5 py-1"><Shield className="h-3.5 w-3.5" />Member</span>}
           </div>
         </section>
 
         {/* Owner verification */}
-        <section className="rounded-xl border border-border p-4">
+        <section className="rounded-xl border border-[#2a2a2a] p-4">
           <div className="flex items-center gap-2 mb-1">
             <KeyRound className="h-4 w-4 text-pink-500" />
             <h2 className="text-sm font-semibold">Verify ownership</h2>
           </div>
-          <p className="text-xs text-muted-foreground mb-4">Enter the owner password to unlock the Owner role. Owners get golden glowing names, all permissions, GIF uploads, avatar decorations, and profile effects.</p>
+          <p className="text-xs text-[#888888] mb-4">Enter the owner password to unlock the Owner role. Owners get golden glowing names, all permissions, GIF uploads, avatar decorations, and profile effects.</p>
           {user.role === "OWNER" ? (
             <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2.5 text-sm text-amber-700 dark:text-amber-400">
               <Crown className="h-4 w-4" /> You are verified as Owner.
@@ -112,20 +112,20 @@ export function SettingsPanel() {
 
         {/* Owner: user management */}
         {user.role === "OWNER" && (
-          <section className="rounded-xl border border-border p-4">
+          <section className="rounded-xl border border-[#2a2a2a] p-4">
             <div className="flex items-center gap-2 mb-3">
               <Users className="h-4 w-4 text-pink-500" />
               <h2 className="text-sm font-semibold">User Management</h2>
             </div>
-            <p className="text-xs text-muted-foreground mb-3">Assign roles (admin/mod) and mute users. Owner has all permissions.</p>
-            {loadingUsers ? <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div> : (
+            <p className="text-xs text-[#888888] mb-3">Assign roles (admin/mod) and mute users. Owner has all permissions.</p>
+            {loadingUsers ? <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-[#888888]" /></div> : (
               <div className="space-y-1 max-h-80 overflow-y-auto custom-scroll">
                 {users.filter((u) => u.id !== user.id).map((u) => (
-                  <div key={u.id} className="flex items-center gap-2 py-2 border-b border-border last:border-0">
+                  <div key={u.id} className="flex items-center gap-2 py-2 border-b border-[#2a2a2a] last:border-0">
                     <AvatarWithDeco src={u.pfpUrl} name={u.displayName} role={u.role} avatarDeco={u.avatarDeco} size="sm" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5"><DisplayName name={u.displayName} role={u.role} className="text-sm" /><RoleBadge role={u.role} /></div>
-                      <p className="text-xs text-muted-foreground">@{u.username}{u.muted && " · muted"}</p>
+                      <p className="text-xs text-[#888888]">@{u.username}{u.muted && " · muted"}</p>
                     </div>
                     <Select value={u.role} onValueChange={(v) => assignRole(u, v as Role)}>
                       <SelectTrigger className="h-7 w-24 text-xs"><SelectValue /></SelectTrigger>
@@ -144,12 +144,12 @@ export function SettingsPanel() {
         )}
 
         {/* Session */}
-        <section className="rounded-xl border border-border p-4">
+        <section className="rounded-xl border border-[#2a2a2a] p-4">
           <h2 className="text-sm font-semibold mb-3">Session</h2>
           <Button variant="outline" onClick={onLogout} disabled={loggingOut} className="gap-2 text-destructive hover:text-destructive">
             {loggingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}Log out
           </Button>
-          <p className="text-xs text-muted-foreground mt-2">You stay logged in across visits until you log out manually.</p>
+          <p className="text-xs text-[#888888] mt-2">You stay logged in across visits until you log out manually.</p>
         </section>
       </div>
     </div>

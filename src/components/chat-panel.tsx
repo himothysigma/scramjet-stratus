@@ -456,24 +456,24 @@ export function ChatPanel() {
   return (
     <div className="h-full flex">
       {/* Channel list */}
-      <aside className="w-52 shrink-0 border-r border-border bg-background flex flex-col">
-        <div className="h-11 px-3 flex items-center justify-between border-b border-border">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Channels</span>
+      <aside className="w-52 shrink-0 border-r border-[#2a2a2a] bg-[#0a0a0a] flex flex-col">
+        <div className="h-11 px-3 flex items-center justify-between border-b border-[#2a2a2a]">
+          <span className="text-xs font-semibold uppercase tracking-wide text-[#888888]">Channels</span>
           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowNewChannel((v) => !v)} aria-label="New channel">
             <Plus className="h-3.5 w-3.5" />
           </Button>
         </div>
         {showNewChannel && (
-          <div className="p-2 border-b border-border flex gap-1.5">
+          <div className="p-2 border-b border-[#2a2a2a] flex gap-1.5">
             <Input value={newChannel} onChange={(e) => setNewChannel(e.target.value)} onKeyDown={(e) => e.key === "Enter" && createChannel()} placeholder="new-channel" className="h-8 text-sm" autoFocus />
             <Button size="sm" className="h-8 px-2 bg-pink-500 hover:bg-pink-600 text-white" onClick={createChannel}>Add</Button>
           </div>
         )}
         <ScrollArea className="flex-1">
           <div className="p-1.5 space-y-0.5">
-            {loadingChannels ? <div className="p-2 flex justify-center"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div> :
+            {loadingChannels ? <div className="p-2 flex justify-center"><Loader2 className="h-4 w-4 animate-spin text-[#888888]" /></div> :
               channels.map((c) => (
-                <button key={c.id} onClick={() => setActiveChannel(c.id)} className={cn("w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors", activeChannel === c.id ? "bg-pink-500/10 text-pink-600" : "hover:bg-accent text-muted-foreground")}>
+                <button key={c.id} onClick={() => setActiveChannel(c.id)} className={cn("w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors", activeChannel === c.id ? "bg-pink-500/10 text-pink-600" : "hover:bg-[#1a1a1a] text-[#888888]")}>
                   <Hash className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{c.name}</span>
                 </button>
               ))
@@ -484,12 +484,12 @@ export function ChatPanel() {
 
       {/* Chat area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="h-11 shrink-0 px-4 flex items-center justify-between border-b border-border">
+        <div className="h-11 shrink-0 px-4 flex items-center justify-between border-b border-[#2a2a2a]">
           <div className="flex items-center gap-2 min-w-0">
-            <Hash className="h-4 w-4 text-muted-foreground shrink-0" />
+            <Hash className="h-4 w-4 text-[#888888] shrink-0" />
             <span className="font-semibold truncate">{activeName}</span>
             <span className={cn("ml-2 h-2 w-2 rounded-full", connected ? "bg-pink-500" : "bg-red-500")} />
-            <span className="text-xs text-muted-foreground">{connected ? "connected" : "reconnecting…"}</span>
+            <span className="text-xs text-[#888888]">{connected ? "connected" : "reconnecting…"}</span>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -500,9 +500,9 @@ export function ChatPanel() {
               aria-label={soundEnabled ? "Mute notification sound" : "Unmute notification sound"}
               title={soundEnabled ? "Sound on" : "Sound off"}
             >
-              {soundEnabled ? <Volume2 className="h-4 w-4 text-pink-500" /> : <VolumeX className="h-4 w-4 text-muted-foreground" />}
+              {soundEnabled ? <Volume2 className="h-4 w-4 text-pink-500" /> : <VolumeX className="h-4 w-4 text-[#888888]" />}
             </Button>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs text-[#888888]">
               <Users className="h-3.5 w-3.5" /><span>{presence.length}</span>
             </div>
           </div>
@@ -510,7 +510,7 @@ export function ChatPanel() {
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto custom-scroll px-4 py-4 space-y-3">
           {messages.length === 0 && (
-            <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground">
+            <div className="h-full flex flex-col items-center justify-center text-center text-[#888888]">
               <Hash className="h-8 w-8 mb-2 opacity-40" />
               <p className="text-sm">No messages yet in #{activeName}</p>
             </div>
@@ -534,17 +534,17 @@ export function ChatPanel() {
           ))}
         </div>
 
-        <div className="shrink-0 p-3 border-t border-border relative">
+        <div className="shrink-0 p-3 border-t border-[#2a2a2a] relative">
           {typingUsers.length > 0 && (
-            <p className="text-xs text-muted-foreground mb-1.5 italic">
+            <p className="text-xs text-[#888888] mb-1.5 italic">
               {typingUsers.length === 1 ? `${typingUsers[0].username} is typing…` : `${typingUsers.length} users are typing…`}
             </p>
           )}
 
           {/* @mention autocomplete dropdown */}
           {showMentionDropdown && (
-            <div className="absolute bottom-full left-3 mb-1 z-20 w-64 rounded-md border border-border bg-popover shadow-md overflow-hidden">
-              <p className="px-2 py-1.5 text-[10px] uppercase tracking-wide text-muted-foreground border-b border-border">
+            <div className="absolute bottom-full left-3 mb-1 z-20 w-64 rounded-md border border-[#2a2a2a] bg-[#1a1a1a] shadow-md overflow-hidden">
+              <p className="px-2 py-1.5 text-[10px] uppercase tracking-wide text-[#888888] border-b border-[#2a2a2a]">
                 Mention — online in #{activeName}
               </p>
               <div className="max-h-56 overflow-y-auto custom-scroll">
@@ -558,7 +558,7 @@ export function ChatPanel() {
                     <AvatarWithDeco src={u.pfpUrl} name={u.displayName} role={u.role} avatarDeco={u.avatarDeco} isGif={u.pfpIsGif} size="xs" />
                     <div className="min-w-0">
                       <DisplayName name={u.displayName} role={u.role} className="text-sm truncate block" />
-                      <span className="text-[10px] text-muted-foreground">@{u.username}</span>
+                      <span className="text-[10px] text-[#888888]">@{u.username}</span>
                     </div>
                   </button>
                 ))}
@@ -590,12 +590,12 @@ export function ChatPanel() {
                   disabled={!connected}
                   aria-label="Pick a GIF"
                   title="Pick a GIF"
-                  className="border-border"
+                  className="border-[#2a2a2a]"
                 >
                   <ImageIcon className="h-4 w-4 text-pink-500" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent align="end" className="w-80 p-2 bg-popover border-border">
+              <PopoverContent align="end" className="w-80 p-2 bg-[#1a1a1a] border-[#2a2a2a]">
                 <Input
                   placeholder="Search GIFs on Giphy…"
                   value={gifQuery}
@@ -608,7 +608,7 @@ export function ChatPanel() {
                     <div className="flex justify-center p-4"><Loader2 className="h-4 w-4 animate-spin text-pink-500" /></div>
                   )}
                   {!gifLoading && gifResults.length === 0 && (
-                    <p className="text-xs text-muted-foreground text-center p-6">
+                    <p className="text-xs text-[#888888] text-center p-6">
                       {gifQuery.trim() ? "No GIFs found" : "Type to search Giphy"}
                     </p>
                   )}
@@ -644,14 +644,14 @@ export function ChatPanel() {
       </div>
 
       {/* Online users */}
-      <aside className="w-48 shrink-0 border-l border-border bg-background hidden lg:flex flex-col">
-        <div className="h-11 px-3 flex items-center border-b border-border">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Online — {presence.length}</span>
+      <aside className="w-48 shrink-0 border-l border-[#2a2a2a] bg-[#0a0a0a] hidden lg:flex flex-col">
+        <div className="h-11 px-3 flex items-center border-b border-[#2a2a2a]">
+          <span className="text-xs font-semibold uppercase tracking-wide text-[#888888]">Online — {presence.length}</span>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-1.5 space-y-0.5">
             {presence.map((u) => (
-              <div key={u.userId} className="group flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent">
+              <div key={u.userId} className="group flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-[#1a1a1a]">
                 <div className="relative shrink-0">
                   <AvatarWithDeco src={u.pfpUrl} name={u.displayName} role={u.role} avatarDeco={u.avatarDeco} isGif={u.pfpIsGif} size="xs" />
                   <span className={cn("absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background", u.muted ? "bg-red-500" : "bg-pink-500")} />
@@ -665,7 +665,7 @@ export function ChatPanel() {
                 {canModerate(user.role) && u.userId !== user.id && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded" aria-label="User actions"><MoreVertical className="h-3 w-3" /></button>
+                      <button className="opacity-0 group-hover:opacity-100 p-1 hover:bg-[#1a1a1a] rounded" aria-label="User actions"><MoreVertical className="h-3 w-3" /></button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       {u.muted ? (
@@ -678,7 +678,7 @@ export function ChatPanel() {
                 )}
               </div>
             ))}
-            {presence.length === 0 && <p className="text-xs text-muted-foreground px-2 py-4 text-center">No one online</p>}
+            {presence.length === 0 && <p className="text-xs text-[#888888] px-2 py-4 text-center">No one online</p>}
           </div>
         </ScrollArea>
       </aside>
@@ -716,12 +716,12 @@ function MessageRow({
       <a {...props} target="_blank" rel="noreferrer" className="text-pink-400 underline hover:text-pink-300" />
     ),
     p: ({ node: _node, children }) => (
-      <p className="text-sm text-foreground/90 break-words whitespace-pre-wrap leading-relaxed">
+      <p className="text-sm text-[#f0f0f0]/90 break-words whitespace-pre-wrap leading-relaxed">
         {processMentions(children, onMention)}
       </p>
     ),
     strong: ({ node: _node, children }) => (
-      <strong className="font-semibold text-foreground">{processMentions(children, onMention)}</strong>
+      <strong className="font-semibold text-[#f0f0f0]">{processMentions(children, onMention)}</strong>
     ),
     em: ({ node: _node, children }) => (
       <em className="italic">{processMentions(children, onMention)}</em>
@@ -730,10 +730,10 @@ function MessageRow({
       <del className="line-through opacity-70">{processMentions(children, onMention)}</del>
     ),
     code: ({ node: _node, ...props }) => (
-      <code {...props} className="bg-muted px-1 py-0.5 rounded text-xs font-mono text-pink-300" />
+      <code {...props} className="bg-[#1a1a1a] px-1 py-0.5 rounded text-xs font-mono text-pink-300" />
     ),
     pre: ({ node: _node, ...props }) => (
-      <pre {...props} className="bg-muted p-2 rounded text-xs font-mono overflow-x-auto my-1" />
+      <pre {...props} className="bg-[#1a1a1a] p-2 rounded text-xs font-mono overflow-x-auto my-1" />
     ),
     ul: ({ node: _node, ...props }) => <ul {...props} className="list-disc pl-4 text-sm" />,
     ol: ({ node: _node, ...props }) => <ol {...props} className="list-decimal pl-4 text-sm" />,
@@ -743,7 +743,7 @@ function MessageRow({
     return (
       <div className="flex gap-2.5 opacity-50">
         <div className="h-8 w-8 shrink-0" />
-        <p className="text-xs italic text-muted-foreground pt-2">Message deleted by owner</p>
+        <p className="text-xs italic text-[#888888] pt-2">Message deleted by owner</p>
       </div>
     )
   }
@@ -777,15 +777,15 @@ function MessageRow({
             <DisplayName name={name} role={role} className="text-sm font-semibold" />
           </button>
           <RoleBadge role={role} />
-          <span className="text-[10px] text-muted-foreground">
+          <span className="text-[10px] text-[#888888]">
             {new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </span>
-          {m.edited && <span className="text-[10px] text-muted-foreground italic">(edited)</span>}
+          {m.edited && <span className="text-[10px] text-[#888888] italic">(edited)</span>}
           <div className="ml-auto flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               type="button"
               onClick={() => onQuote(m)}
-              className="text-muted-foreground hover:text-pink-500 p-1"
+              className="text-[#888888] hover:text-pink-500 p-1"
               aria-label="Save as quote"
               title="Save as quote"
             >
@@ -795,7 +795,7 @@ function MessageRow({
               <button
                 type="button"
                 onClick={() => onStartEdit(m)}
-                className="text-muted-foreground hover:text-pink-500 p-1"
+                className="text-[#888888] hover:text-pink-500 p-1"
                 aria-label="Edit message"
                 title="Edit"
               >
@@ -806,7 +806,7 @@ function MessageRow({
               <button
                 type="button"
                 onClick={() => onDelete(m)}
-                className="text-muted-foreground hover:text-destructive p-1"
+                className="text-[#888888] hover:text-destructive p-1"
                 aria-label="Delete message"
                 title="Delete"
               >
@@ -844,7 +844,7 @@ function MessageRow({
               <img
                 src={m.gifUrl}
                 alt="GIF message"
-                className="mt-1 rounded-md max-h-48 max-w-full border border-border object-contain"
+                className="mt-1 rounded-md max-h-48 max-w-full border border-[#2a2a2a] object-contain"
                 loading="lazy"
               />
             )}

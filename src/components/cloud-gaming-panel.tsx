@@ -74,15 +74,15 @@ export function CloudGamingPanel() {
     // Real render-quality control: scale the frame. Lower quality = scaled down then upscaled.
     const scale = q.id === "low" ? 0.85 : q.id === "ultra" ? 1 : 1
     return (
-      <div className="h-full flex flex-col bg-background">
-        <div className="h-11 shrink-0 px-3 flex items-center justify-between border-b border-border">
+      <div className="h-full flex flex-col bg-[#0a0a0a]">
+        <div className="h-11 shrink-0 px-3 flex items-center justify-between border-b border-[#2a2a2a]">
           <div className="flex items-center gap-3 min-w-0">
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setActive(null)}>
               <ArrowLeft className="h-4 w-4" /> Library
             </Button>
             <span className="font-semibold truncate">{active.name}</span>
           </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <div className="flex items-center gap-3 text-xs text-[#888888]">
             <span className="flex items-center gap-1">
               <Globe className="h-3.5 w-3.5" /> {region().code} {ping}ms
             </span>
@@ -116,8 +116,8 @@ export function CloudGamingPanel() {
   // Cloud game source view (Raccoon, CrazyGames, etc.)
   if (cloudSource) {
     return (
-      <div className="h-full flex flex-col bg-background">
-        <div className="h-11 shrink-0 px-3 flex items-center justify-between border-b border-border">
+      <div className="h-full flex flex-col bg-[#0a0a0a]">
+        <div className="h-11 shrink-0 px-3 flex items-center justify-between border-b border-[#2a2a2a]">
           <div className="flex items-center gap-3 min-w-0">
             <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setCloudSource(null)}>
               <ArrowLeft className="h-4 w-4" /> Library
@@ -162,9 +162,9 @@ export function CloudGamingPanel() {
             launchGame(g)
           }
         }}
-        className="group relative text-left rounded-xl border border-border bg-card hover:border-pink-500/40 hover:shadow-lg transition-all overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/50"
+        className="group relative text-left rounded-xl border border-[#2a2a2a] bg-[#121212] hover:border-pink-500/40 hover:shadow-lg transition-all overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/50"
       >
-        <div className="aspect-[16/10] relative overflow-hidden bg-muted">
+        <div className="aspect-[16/10] relative overflow-hidden bg-[#1a1a1a]">
           <img src={g.cover} alt={`${g.name} cover`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
           {/* Favorite star — top-left, over the cover image */}
           <button
@@ -188,19 +188,19 @@ export function CloudGamingPanel() {
         </div>
         <div className="p-3">
           <h3 className="font-semibold text-sm truncate">{g.name}</h3>
-          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{g.description}</p>
-          <p className="text-[10px] text-muted-foreground/70 mt-1">{g.controls}</p>
+          <p className="text-xs text-[#888888] line-clamp-1 mt-0.5">{g.description}</p>
+          <p className="text-[10px] text-[#888888]/70 mt-1">{g.controls}</p>
         </div>
       </div>
     )
   }
 
   const renderEmpty = (message: string, icon: ReactNode) => (
-    <div className="flex flex-col items-center justify-center text-center py-16 px-4 border border-dashed border-border rounded-xl">
+    <div className="flex flex-col items-center justify-center text-center py-16 px-4 border border-dashed border-[#2a2a2a] rounded-xl">
       <div className="h-12 w-12 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-3 text-pink-500">
         {icon}
       </div>
-      <p className="text-sm text-muted-foreground max-w-xs">{message}</p>
+      <p className="text-sm text-[#888888] max-w-xs">{message}</p>
     </div>
   )
 
@@ -214,7 +214,7 @@ export function CloudGamingPanel() {
       onClick={() => setTab(id)}
       className={cn(
         "px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap inline-flex items-center",
-        tab === id ? "border-pink-500 text-pink-500" : "border-transparent text-muted-foreground hover:text-foreground"
+        tab === id ? "border-pink-500 text-pink-500" : "border-transparent text-[#888888] hover:text-[#f0f0f0]"
       )}
     >
       {icon}
@@ -234,14 +234,14 @@ export function CloudGamingPanel() {
           </div>
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Cloud Gaming</h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#888888]">
               {region().code} {region().name} · ~{ping}ms · {quality().name}
             </p>
           </div>
         </div>
 
         {/* Tabs: Local Games / Cloud Games / Favorites / Recent */}
-        <div className="flex gap-1 mt-4 mb-5 border-b border-border overflow-x-auto">
+        <div className="flex gap-1 mt-4 mb-5 border-b border-[#2a2a2a] overflow-x-auto">
           {tabBtn("local", "Local Games", <Gamepad2 className="h-4 w-4 mr-1.5" />)}
           {tabBtn("cloud", "Cloud Games", <Cloud className="h-4 w-4 mr-1.5" />)}
           {tabBtn("favorites", "Favorites", <Star className="h-4 w-4 mr-1.5" />, favorites.length)}
@@ -250,7 +250,7 @@ export function CloudGamingPanel() {
 
         {tab === "local" && (
           <>
-            <p className="text-sm text-muted-foreground mb-5">
+            <p className="text-sm text-[#888888] mb-5">
               8 real playable games — no external requests, run directly in your browser.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -261,7 +261,7 @@ export function CloudGamingPanel() {
 
         {tab === "cloud" && (
           <>
-            <p className="text-sm text-muted-foreground mb-5">
+            <p className="text-sm text-[#888888] mb-5">
               Stream AAA + browser games from external cloud platforms. These load in an iframe — some may require a stable connection.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -269,14 +269,14 @@ export function CloudGamingPanel() {
                 <button
                   key={s.id}
                   onClick={() => setCloudSource(s)}
-                  className="group flex items-center gap-4 text-left rounded-xl border border-border bg-card hover:border-pink-500/40 hover:shadow-lg transition-all overflow-hidden p-4"
+                  className="group flex items-center gap-4 text-left rounded-xl border border-[#2a2a2a] bg-[#121212] hover:border-pink-500/40 hover:shadow-lg transition-all overflow-hidden p-4"
                 >
                   <img src={s.thumbnail} alt={s.name} className="h-14 w-14 rounded-lg shrink-0" />
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-sm truncate">{s.name}</h3>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{s.description}</p>
+                    <p className="text-xs text-[#888888] line-clamp-2 mt-0.5">{s.description}</p>
                   </div>
-                  <Play className="h-5 w-5 text-muted-foreground group-hover:text-pink-500 transition-colors shrink-0" />
+                  <Play className="h-5 w-5 text-[#888888] group-hover:text-pink-500 transition-colors shrink-0" />
                 </button>
               ))}
             </div>
@@ -285,7 +285,7 @@ export function CloudGamingPanel() {
 
         {tab === "favorites" && (
           <>
-            <p className="text-sm text-muted-foreground mb-5">
+            <p className="text-sm text-[#888888] mb-5">
               Your starred games, ready to launch in one click.
             </p>
             {favoriteGames.length === 0 ? (
@@ -300,7 +300,7 @@ export function CloudGamingPanel() {
 
         {tab === "recent" && (
           <>
-            <p className="text-sm text-muted-foreground mb-5">
+            <p className="text-sm text-[#888888] mb-5">
               Pick up where you left off — your last played games.
             </p>
             {recentGames.length === 0 ? (

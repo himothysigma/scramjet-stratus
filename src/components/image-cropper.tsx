@@ -100,7 +100,7 @@ export function ImageCropper({
             {title}
           </DialogTitle>
         </DialogHeader>
-        <div className="max-h-[60vh] overflow-auto rounded-md bg-muted/40 flex items-center justify-center p-2">
+        <div className="max-h-[60vh] overflow-auto rounded-md bg-[#1a1a1a]/40 flex items-center justify-center p-2">
           {src && (
             <ReactCrop
               crop={crop}

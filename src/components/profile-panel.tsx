@@ -119,11 +119,11 @@ export function ProfilePanel() {
       {isOwner && <ProfileEffectLayer effect={user.profileEffect} />}
       <div className="max-w-2xl mx-auto p-4 sm:p-6 relative z-10">
         {/* Banner */}
-        <div className="relative rounded-xl overflow-hidden border border-border bg-muted/40 group">
+        <div className="relative rounded-xl overflow-hidden border border-[#2a2a2a] bg-[#1a1a1a]/40 group">
           <div className="h-40 sm:h-48 w-full bg-gradient-to-br from-pink-500/20 via-background to-background">
             {user.bannerUrl && <img src={user.bannerUrl} alt="Banner" className={user.bannerIsGif ? "w-full h-full object-cover" : "w-full h-full object-cover"} />}
           </div>
-          <button onClick={() => bannerInput.current?.click()} disabled={uploading === "banner"} className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md bg-background/90 backdrop-blur border border-border hover:bg-background disabled:opacity-50">
+          <button onClick={() => bannerInput.current?.click()} disabled={uploading === "banner"} className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md bg-[#0a0a0a]/90 backdrop-blur border border-[#2a2a2a] hover:bg-[#0a0a0a] disabled:opacity-50">
             {uploading === "banner" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
             {user.bannerUrl ? "Change banner" : "Upload banner"}
           </button>
@@ -134,7 +134,7 @@ export function ProfilePanel() {
         <div className="flex items-end gap-4 -mt-8 px-2 relative z-10">
           <div className="relative">
             <AvatarWithDeco src={user.pfpUrl} name={user.displayName} role={user.role} avatarDeco={user.avatarDeco} isGif={user.pfpIsGif} size="xl" className="border-4 border-background" />
-            <button onClick={() => pfpInput.current?.click()} disabled={uploading === "pfp"} className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-background border border-border flex items-center justify-center hover:bg-accent disabled:opacity-50" aria-label="Change profile picture">
+            <button onClick={() => pfpInput.current?.click()} disabled={uploading === "pfp"} className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-[#0a0a0a] border border-[#2a2a2a] flex items-center justify-center hover:bg-[#1a1a1a] disabled:opacity-50" aria-label="Change profile picture">
               {uploading === "pfp" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
             </button>
             <input ref={pfpInput} type="file" accept="image/*" className="hidden" onChange={onPickPfp} />
@@ -144,8 +144,8 @@ export function ProfilePanel() {
               <DisplayName name={user.displayName} role={user.role} className="text-lg font-semibold" />
               <RoleBadge role={user.role} />
             </div>
-            <p className="text-sm text-muted-foreground">@{user.username}</p>
-            {user.status && <p className="text-xs text-muted-foreground mt-0.5 italic">"{user.status}"</p>}
+            <p className="text-sm text-[#888888]">@{user.username}</p>
+            {user.status && <p className="text-xs text-[#888888] mt-0.5 italic">"{user.status}"</p>}
           </div>
         </div>
 
@@ -158,12 +158,12 @@ export function ProfilePanel() {
           <div className="space-y-2">
             <Label htmlFor="username">Username {isOwner && <span className="text-amber-500 text-xs">(owner: 1 char min)</span>}</Label>
             <Input id="username" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))} maxLength={24} />
-            <p className="text-xs text-muted-foreground">Lowercase letters, numbers, hyphens, underscores. {isOwner ? "Owner can use 1 char." : "Min 2 chars."}</p>
+            <p className="text-xs text-[#888888]">Lowercase letters, numbers, hyphens, underscores. {isOwner ? "Owner can use 1 char." : "Min 2 chars."}</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="bio">Bio</Label>
             <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} maxLength={200} rows={3} placeholder="Tell people about yourself" />
-            <p className="text-xs text-muted-foreground text-right">{bio.length}/200</p>
+            <p className="text-xs text-[#888888] text-right">{bio.length}/200</p>
           </div>
           <Button
             variant="outline"
@@ -195,7 +195,7 @@ export function ProfilePanel() {
               <Sparkles className="h-4 w-4 text-amber-500" />
               <h3 className="text-sm font-semibold text-amber-600">Owner Decorations</h3>
             </div>
-            <p className="text-xs text-muted-foreground">Avatar decorations and profile effects are owner-exclusive. Normal members see images only — no GIFs, no deco, no effects.</p>
+            <p className="text-xs text-[#888888]">Avatar decorations and profile effects are owner-exclusive. Normal members see images only — no GIFs, no deco, no effects.</p>
 
             <div className="space-y-2">
               <Label className="flex items-center gap-1.5"><Palette className="h-3.5 w-3.5" /> Avatar Decoration</Label>
@@ -215,12 +215,12 @@ export function ProfilePanel() {
                   {PROFILE_EFFECTS.map((e) => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">Effects animate your profile when others view it.</p>
+              <p className="text-xs text-[#888888]">Effects animate your profile when others view it.</p>
             </div>
           </div>
         ) : (
-          <div className="mt-6 rounded-xl border border-border p-4">
-            <p className="text-xs text-muted-foreground">
+          <div className="mt-6 rounded-xl border border-[#2a2a2a] p-4">
+            <p className="text-xs text-[#888888]">
               GIF profile pictures/banners, avatar decorations, and profile effects are owner-exclusive features. Verify ownership in Settings to unlock them.
             </p>
           </div>

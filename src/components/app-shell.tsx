@@ -1,21 +1,28 @@
 "use client"
 
-import { useState } from "react"
+import { useState, lazy, Suspense } from "react"
 import { TopBar } from "@/components/top-bar"
-import { ChatPanel } from "@/components/chat-panel"
-import { CloudGamingPanel } from "@/components/cloud-gaming-panel"
-import { BrowserPanel } from "@/components/browser-panel"
-import { ProfilePanel } from "@/components/profile-panel"
-import { SettingsPanel } from "@/components/settings-panel"
-import { FriendsPanel } from "@/components/friends-panel"
-import { InfractionsPanel } from "@/components/infractions-panel"
-import { MessageSquare, Gamepad2, Globe, User, Settings, Users, Shield } from "lucide-react"
+import { ErrorBoundary } from "@/components/error-boundary"
+import { MessageSquare, Gamepad2, Globe, User, Settings, Users, Shield, Music, Bot, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useGaming } from "@/hooks/use-gaming"
 import { useAuth } from "@/hooks/use-auth"
 import { REGIONS } from "@/lib/client-constants"
 
-export type Panel = "chat" | "cloud-gaming" | "browser" | "friends" | "moderation" | "profile" | "settings"
+// Lazy load panels — only load what the user actually opens
+const ChatPanel = lazy(() => import("@/components/chat-panel").then(m => ({ default: m.ChatPanel })))
+const FriendsPanel = lazy(() => import("@/components/friends-panel").then(m => ({ default: m.FriendsPanel })))
+const CloudGamingPanel = lazy(() => import("@/components/cloud-gaming-panel").then(m => ({ default: m.CloudGamingPanel })))
+const ProfilePanel = lazy(() => import("@/components/profile-panel").then(m => ({ default: m.ProfilePanel })))
+const SettingsPanel = lazy(() => import("@/components/settings-panel").then(m => ({ default: m.SettingsPanel })))
+const InfractionsPanel = lazy(() => import("@/components/infractions-panel").then(m => ({ default: m.InfractionsPanel })))
+const MusicPanel = lazy(() => import("@/components/music-panel").then(m => ({ default: m.MusicPanel })))
+const AIPanel = lazy(() => import("@/components/ai-panel").then(m => ({ default: m.AIPanel })))
+const AdultPanel = lazy(() => import("@/components/adult-panel").then(m => ({ default: m.AdultPanel })))
+// BrowserPanel loaded directly (was causing issues with lazy loading)
+import { BrowserPanel } from "@/components/browser-panel"
+
+export type Panel = "chat" | "friends" | "moderation" | "cloud-gaming" | "browser" | "music" | "ai" | "adult" | "profile" | "settings"
 
 const NAV: { id: Panel; label: string; icon: typeof MessageSquare; modOnly?: boolean }[] = [
   { id: "chat", label: "Chat", icon: MessageSquare },
@@ -23,6 +30,9 @@ const NAV: { id: Panel; label: string; icon: typeof MessageSquare; modOnly?: boo
   { id: "moderation", label: "Moderation", icon: Shield, modOnly: true },
   { id: "cloud-gaming", label: "Gaming", icon: Gamepad2 },
   { id: "browser", label: "Synnical", icon: Globe },
+  { id: "music", label: "Music", icon: Music },
+  { id: "ai", label: "AI Assistant", icon: Bot },
+  { id: "adult", label: "18+ Adult", icon: AlertTriangle },
   { id: "profile", label: "Profile", icon: User },
   { id: "settings", label: "Settings", icon: Settings },
 ]
@@ -37,12 +47,12 @@ export function AppShell() {
   const visibleNav = NAV.filter((item) => !item.modOnly || isMod)
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
       <TopBar panel={panel} onPanel={setPanel} />
 
       <div className="flex-1 flex min-h-0">
         {/* Icon rail */}
-        <nav className="w-14 sm:w-16 shrink-0 border-r border-border bg-background flex flex-col items-center py-3 gap-1">
+        <nav className="w-14 sm:w-16 shrink-0 border-r border-[#2a2a2a] bg-[#0d0d0d] flex flex-col items-center py-3 gap-1 overflow-y-auto custom-scroll">
           {visibleNav.map((item) => {
             const Icon = item.icon
             const active = panel === item.id
@@ -54,7 +64,7 @@ export function AppShell() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "group relative flex flex-col items-center justify-center gap-1 w-11 h-12 rounded-lg transition-colors",
-                  active ? "bg-pink-500/10 text-pink-600" : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  active ? "bg-pink-500/10 text-pink-500" : "text-[#888888] hover:bg-[#1a1a1a] hover:text-[#f0f0f0]"
                 )}
               >
                 <Icon className="h-5 w-5" />
@@ -69,23 +79,30 @@ export function AppShell() {
 
         {/* Panel content */}
         <main className="flex-1 min-w-0 min-h-0 overflow-hidden">
-          {panel === "chat" && <ChatPanel />}
-          {panel === "friends" && <FriendsPanel />}
-          {panel === "moderation" && isMod && <InfractionsPanel />}
-          {panel === "cloud-gaming" && <CloudGamingPanel />}
-          {panel === "browser" && <BrowserPanel />}
-          {panel === "profile" && <ProfilePanel />}
-          {panel === "settings" && <SettingsPanel />}
+          <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="h-6 w-6 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" /></div>}>
+            <ErrorBoundary>
+              {panel === "chat" && <ChatPanel />}
+              {panel === "friends" && <FriendsPanel />}
+              {panel === "moderation" && isMod && <InfractionsPanel />}
+              {panel === "cloud-gaming" && <CloudGamingPanel />}
+              {panel === "browser" && <BrowserPanel />}
+              {panel === "music" && <MusicPanel />}
+              {panel === "ai" && <AIPanel />}
+              {panel === "adult" && <AdultPanel />}
+              {panel === "profile" && <ProfilePanel />}
+              {panel === "settings" && <SettingsPanel />}
+            </ErrorBoundary>
+          </Suspense>
         </main>
       </div>
 
-      {/* Sticky functional footer — region + status */}
-      <footer className="h-8 shrink-0 border-t border-border bg-background flex items-center justify-between px-3 text-xs text-muted-foreground">
+      {/* Sticky functional footer */}
+      <footer className="h-8 shrink-0 border-t border-[#2a2a2a] bg-[#0a0a0a] flex items-center justify-between px-3 text-xs text-[#888888]">
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-pink-500 animate-pulse" />
           <span>Region: {region.code} {region.name}</span>
         </div>
-        <span className="hidden sm:block">Stratus · everything here actually works</span>
+        <span className="hidden sm:block">Synnical · everything here actually works</span>
       </footer>
     </div>
   )

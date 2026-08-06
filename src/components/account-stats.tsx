@@ -76,7 +76,7 @@ export function AccountStats({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg bg-background border-border max-h-[90vh] overflow-y-auto custom-scroll">
+      <DialogContent className="sm:max-w-lg bg-[#0a0a0a] border-[#2a2a2a] max-h-[90vh] overflow-y-auto custom-scroll">
         <DialogHeader>
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-pink-500" />
@@ -88,7 +88,7 @@ export function AccountStats({
         </DialogHeader>
 
         {/* Identity row */}
-        <div className="flex items-center gap-3 rounded-lg border border-border p-3 bg-muted/30">
+        <div className="flex items-center gap-3 rounded-lg border border-[#2a2a2a] p-3 bg-[#1a1a1a]/30">
           <AvatarWithDeco
             src={user.pfpUrl}
             name={user.displayName}
@@ -101,16 +101,16 @@ export function AccountStats({
               <DisplayName name={user.displayName} role={user.role} className="text-sm font-semibold truncate" />
               <RoleBadge role={user.role} />
             </div>
-            <p className="text-xs text-muted-foreground truncate">@{user.username}</p>
+            <p className="text-xs text-[#888888] truncate">@{user.username}</p>
           </div>
         </div>
 
         {loading ? (
           <div className="py-8 flex justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <Loader2 className="h-6 w-6 animate-spin text-[#888888]" />
           </div>
         ) : !stats || !reqs ? (
-          <div className="py-8 text-center text-sm text-muted-foreground">
+          <div className="py-8 text-center text-sm text-[#888888]">
             Could not load account stats.
           </div>
         ) : (
@@ -120,20 +120,20 @@ export function AccountStats({
               className={cn(
                 "rounded-lg border p-3 flex items-start gap-3",
                 stats.isTrusted
-                  ? "border-emerald-500/30 bg-emerald-500/10"
+                  ? "border-pink-500/30 bg-pink-500/10"
                   : "border-pink-500/30 bg-pink-500/5"
               )}
             >
               {stats.isTrusted ? (
-                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                <CheckCircle2 className="h-5 w-5 text-pink-500 shrink-0 mt-0.5" />
               ) : (
                 <XCircle className="h-5 w-5 text-pink-500 shrink-0 mt-0.5" />
               )}
               <div className="min-w-0">
-                <p className={cn("text-sm font-semibold", stats.isTrusted ? "text-emerald-600" : "text-pink-600")}>
+                <p className={cn("text-sm font-semibold", stats.isTrusted ? "text-pink-600" : "text-pink-600")}>
                   {stats.isTrusted ? "Trusted account" : "Not yet trusted"}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-[#888888]">
                   {stats.isTrusted
                     ? isRoleTrusted
                       ? "Trusted by role (staff). Thank you for helping moderate Synnical."
@@ -181,12 +181,12 @@ export function AccountStats({
             </div>
 
             {/* Trusted requirements with progress bars */}
-            <div className="rounded-lg border border-border p-3 space-y-3">
+            <div className="rounded-lg border border-[#2a2a2a] p-3 space-y-3">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-pink-500" />
                 <h3 className="text-sm font-semibold">Trusted requirements</h3>
               </div>
-              <p className="text-xs text-muted-foreground -mt-1">
+              <p className="text-xs text-[#888888] -mt-1">
                 Staff (owner/admin/mod) are trusted automatically.
               </p>
 
@@ -241,14 +241,14 @@ function StatCard({
         "rounded-lg border p-2.5 flex flex-col gap-1",
         tone === "warn"
           ? "border-amber-500/30 bg-amber-500/5"
-          : "border-border bg-muted/30"
+          : "border-[#2a2a2a] bg-[#1a1a1a]/30"
       )}
     >
       <div className="flex items-center gap-1.5">
         <Icon className={cn("h-3.5 w-3.5", tone === "warn" ? "text-amber-500" : "text-pink-500")} />
-        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="text-[10px] uppercase tracking-wide text-[#888888]">{label}</span>
       </div>
-      <span className={cn("text-base font-semibold leading-none", tone === "warn" ? "text-amber-600" : "text-foreground")}>
+      <span className={cn("text-base font-semibold leading-none", tone === "warn" ? "text-amber-600" : "text-[#f0f0f0]")}>
         {value}
       </span>
     </div>
@@ -278,8 +278,8 @@ function RequirementRow({
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
-        <span className="text-foreground/80">{label}</span>
-        <span className={cn("font-medium", met ? "text-emerald-600" : "text-muted-foreground")}>
+        <span className="text-[#f0f0f0]/80">{label}</span>
+        <span className={cn("font-medium", met ? "text-pink-600" : "text-[#888888]")}>
           {met ? (
             <span className="inline-flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3" />
@@ -287,7 +287,7 @@ function RequirementRow({
             </span>
           ) : (
             <span>
-              {format(current)} <span className="text-muted-foreground/70">/ {format(target)}</span>
+              {format(current)} <span className="text-[#888888]/70">/ {format(target)}</span>
             </span>
           )}
         </span>
@@ -296,7 +296,7 @@ function RequirementRow({
         value={met ? 100 : pct}
         className={cn(
           "h-1.5",
-          met ? "[&>[data-slot=progress-indicator]]:bg-emerald-500" : "[&>[data-slot=progress-indicator]]:bg-pink-500"
+          met ? "[&>[data-slot=progress-indicator]]:bg-pink-500" : "[&>[data-slot=progress-indicator]]:bg-pink-500"
         )}
       />
       <span className="sr-only">{unit}</span>

@@ -17,7 +17,7 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
   if (!user) return null
 
   return (
-    <header className="h-14 shrink-0 border-b border-border bg-background/80 backdrop-blur flex items-center gap-2 px-3">
+    <header className="h-14 shrink-0 border-b border-[#2a2a2a] bg-[#0a0a0a]/80 backdrop-blur flex items-center gap-2 px-3">
       {/* Brand */}
       <button
         onClick={() => onPanel("chat")}
@@ -26,7 +26,7 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
         <div className="h-8 w-8 rounded-lg bg-pink-500/10 border border-pink-500/20 flex items-center justify-center">
           <Cloud className="h-4.5 w-4.5 text-pink-500" />
         </div>
-        <span className="font-semibold tracking-tight hidden sm:block">Stratus</span>
+        <span className="font-semibold tracking-tight hidden sm:block">Synnical</span>
       </button>
 
       <div className="flex-1" />
@@ -44,12 +44,12 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-56 p-1">
-            <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Game server region</p>
+            <p className="px-2 py-1.5 text-xs font-medium text-[#888888]">Game server region</p>
             {REGIONS.map((r) => (
               <button
                 key={r.id}
                 onClick={() => setRegion(r.id)}
-                className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent transition-colors"
+                className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-[#1a1a1a] transition-colors"
               >
                 <span className="text-base">{r.code}</span>
                 <span className="flex-1 text-left">{r.name}</span>
@@ -70,12 +70,12 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-60 p-1">
-            <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Stream quality</p>
+            <p className="px-2 py-1.5 text-xs font-medium text-[#888888]">Stream quality</p>
             {QUALITY_LEVELS.map((q) => (
               <button
                 key={q.id}
                 onClick={() => setQuality(q.id)}
-                className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent transition-colors"
+                className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-[#1a1a1a] transition-colors"
               >
                 <span className="flex-1 text-left">{q.name}</span>
                 {qualityId === q.id && <Check className="h-4 w-4 text-pink-500" />}
@@ -99,7 +99,7 @@ export function TopBar({ panel, onPanel }: { panel: Panel; onPanel: (p: Panel) =
         <button
           onClick={() => onPanel("profile")}
           className={`flex items-center gap-2 h-9 pl-1 pr-2 rounded-md transition-colors ${
-            panel === "profile" ? "bg-accent" : "hover:bg-accent"
+            panel === "profile" ? "bg-[#1a1a1a]" : "hover:bg-[#1a1a1a]"
           }`}
         >
           <Avatar className="h-7 w-7">
