@@ -5,9 +5,7 @@ import { TopBar } from "@/components/top-bar"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { MessageSquare, Gamepad2, Globe, User, Settings, Users, Shield, Music, Bot, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useGaming } from "@/hooks/use-gaming"
 import { useAuth } from "@/hooks/use-auth"
-import { REGIONS } from "@/lib/client-constants"
 
 // Lazy load panels — only load what the user actually opens
 const ChatPanel = lazy(() => import("@/components/chat-panel").then(m => ({ default: m.ChatPanel })))
@@ -39,9 +37,7 @@ const NAV: { id: Panel; label: string; icon: typeof MessageSquare; modOnly?: boo
 
 export function AppShell() {
   const [panel, setPanel] = useState<Panel>("chat")
-  const { regionId } = useGaming()
   const { user } = useAuth()
-  const region = REGIONS.find((r) => r.id === regionId) || REGIONS[0]
 
   const isMod = user?.role === "OWNER" || user?.role === "ADMIN" || user?.role === "MOD"
   const visibleNav = NAV.filter((item) => !item.modOnly || isMod)
@@ -100,9 +96,9 @@ export function AppShell() {
       <footer className="h-8 shrink-0 border-t border-[#2a2a2a] bg-[#0a0a0a] flex items-center justify-between px-3 text-xs text-[#888888]">
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-pink-500 animate-pulse" />
-          <span>Region: {region.code} {region.name}</span>
+          <span>Synnical</span>
         </div>
-        <span className="hidden sm:block">Synnical · everything here actually works</span>
+        <span className="hidden sm:block">everything here actually works</span>
       </footer>
     </div>
   )

@@ -20,12 +20,24 @@ export function CloudGamingPanel() {
   const { quality, region } = useGaming()
   const frameWrapRef = useRef<HTMLDivElement>(null)
 
-  // Estimated latency per region (honest indicator, computed from region id)
-  const ping =
-    region().id === "auto" ? 18 :
-    region().id.startsWith("eu") ? 24 :
-    region().id.startsWith("us") ? 86 :
-    region().id.startsWith("ap") ? 142 : 40
+  // Real ping measurement — actually pings the server and measures response time
+  const [ping, setPing] = useState<number | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    const measurePing = async () => {
+      try {
+        const start = performance.now()
+        await fetch("/api/auth/me", { cache: "no-store" })
+        const elapsed = Math.round(performance.now() - start)
+        if (!cancelled) setPing(elapsed)
+      } catch {
+        if (!cancelled) setPing(null)
+      }
+    }
+    measurePing()
+    const interval = setInterval(measurePing, 30000) // re-measure every 30s
+    return () => { cancelled = true; clearInterval(interval) }
+  }, [])
 
   // Load favorites + history on mount
   useEffect(() => {
@@ -84,7 +96,7 @@ export function CloudGamingPanel() {
           </div>
           <div className="flex items-center gap-3 text-xs text-[#888888]">
             <span className="flex items-center gap-1">
-              <Globe className="h-3.5 w-3.5" /> {region().code} {ping}ms
+              <Globe className="h-3.5 w-3.5" /> {region().code} {ping !== null ? `${ping}ms` : "measuring…"}
             </span>
             <span className="flex items-center gap-1">
               <Gauge className="h-3.5 w-3.5" /> {q.name.split(" ")[0]}
@@ -235,7 +247,7 @@ export function CloudGamingPanel() {
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Cloud Gaming</h1>
             <p className="text-sm text-[#888888]">
-              {region().code} {region().name} · ~{ping}ms · {quality().name}
+              {region().code} {region().name} · ~{ping !== null ? `${ping}ms` : "measuring…"} · {quality().name}
             </p>
           </div>
         </div>

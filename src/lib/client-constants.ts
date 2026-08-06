@@ -34,10 +34,10 @@ export const REGIONS = [
 ] as const
 
 export const QUALITY_LEVELS = [
-  { id: "low", name: "Low (720p · 30fps)", scale: 0.75 },
-  { id: "medium", name: "Medium (1080p · 60fps)", scale: 1 },
-  { id: "high", name: "High (1440p · 60fps)", scale: 1.25 },
-  { id: "ultra", name: "Ultra (Native)", scale: 1 },
+  { id: "low", name: "Low (0.75x scale)", scale: 0.75 },
+  { id: "medium", name: "Medium (1x scale)", scale: 1 },
+  { id: "high", name: "High (1.25x scale)", scale: 1.25 },
+  { id: "ultra", name: "Ultra (native)", scale: 1 },
 ] as const
 
 // External cloud game sources (embedded under Gaming → Cloud Games tab)
