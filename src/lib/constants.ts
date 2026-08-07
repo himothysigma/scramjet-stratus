@@ -8,8 +8,8 @@ export const SESSION_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 365
 // Chat mini-service port (socket.io) — sandbox dev mode.
 export const CHAT_SERVICE_PORT = 3001
 
-// Upload directory (persisted outside public, served via API)
-export const UPLOAD_DIR = "/home/z/my-project/uploads"
+// Upload directory — relative to project root (works in sandbox + Docker containers)
+export const UPLOAD_DIR = process.env.UPLOAD_DIR || "./uploads"
 
 // Roles
 export type Role = "OWNER" | "ADMIN" | "MOD" | "MEMBER"

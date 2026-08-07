@@ -6,7 +6,7 @@ import { Server } from "socket.io"
 import { Database } from "bun:sqlite"
 
 const PORT = 3001
-const DB_PATH = process.env.DATABASE_URL?.replace("file:", "") || "/home/z/my-project/db/custom.db"
+const DB_PATH = process.env.DATABASE_URL?.replace("file:", "").replace(/^\.\//, "") || "./db/custom.db"
 
 const sqlite = new Database(DB_PATH)
 sqlite.exec("PRAGMA journal_mode = WAL;")

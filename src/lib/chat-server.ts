@@ -1,6 +1,6 @@
 import type { Server as HTTPServer } from "http"
 import { Server as IOServer } from "socket.io"
-import { db } from "@/lib/db"
+import { db } from "./db"
 
 interface ClientUser {
   userId: string
