@@ -115,15 +115,20 @@ export function ProfilePanel() {
   }
 
   return (
-    <div className="h-full overflow-y-auto custom-scroll profile-effect-container">
-      {isOwner && <ProfileEffectLayer effect={user.profileEffect} />}
-      <div className="max-w-2xl mx-auto p-4 sm:p-6 relative z-10">
+    <div className="h-full overflow-y-auto custom-scroll relative">
+      {isOwner && <div className="absolute inset-0 pointer-events-none overflow-hidden"><ProfileEffectLayer effect={user.profileEffect} /></div>}
+      <div className="max-w-2xl mx-auto p-4 sm:p-6 relative" style={{ zIndex: 10 }}>
         {/* Banner */}
-        <div className="relative rounded-xl overflow-hidden border border-[#2a2a2a] bg-[#1a1a1a]/40 group">
-          <div className="h-40 sm:h-48 w-full bg-gradient-to-br from-pink-500/20 via-background to-background">
-            {user.bannerUrl && <img src={user.bannerUrl} alt="Banner" className={user.bannerIsGif ? "w-full h-full object-cover" : "w-full h-full object-cover"} />}
+        <div className="relative rounded-xl overflow-hidden border border-[#2a2a2a] bg-[#1a1a1a]/40">
+          <div className="h-40 sm:h-48 w-full bg-gradient-to-br from-pink-500/20 to-[#0a0a0a]">
+            {user.bannerUrl && <img src={user.bannerUrl} alt="Banner" className="w-full h-full object-cover" />}
           </div>
-          <button onClick={() => bannerInput.current?.click()} disabled={uploading === "banner"} className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md bg-[#0a0a0a]/90 backdrop-blur border border-[#2a2a2a] hover:bg-[#0a0a0a] disabled:opacity-50">
+          <button
+            onClick={() => bannerInput.current?.click()}
+            disabled={uploading === "banner"}
+            className="absolute bottom-3 right-3 z-20 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md bg-[#0a0a0a]/90 backdrop-blur border border-[#2a2a2a] hover:bg-[#0a0a0a] disabled:opacity-50 cursor-pointer"
+            style={{ pointerEvents: "auto" }}
+          >
             {uploading === "banner" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
             {user.bannerUrl ? "Change banner" : "Upload banner"}
           </button>
@@ -131,7 +136,7 @@ export function ProfilePanel() {
         </div>
 
         {/* PFP + identity */}
-        <div className="flex items-end gap-4 -mt-8 px-2 relative z-10">
+        <div className="flex items-end gap-4 -mt-8 px-2 relative" style={{ zIndex: 10 }}>
           <div className="relative">
             <AvatarWithDeco src={user.pfpUrl} name={user.displayName} role={user.role} avatarDeco={user.avatarDeco} isGif={user.pfpIsGif} size="xl" className="border-4 border-background" />
             <button onClick={() => pfpInput.current?.click()} disabled={uploading === "pfp"} className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-[#0a0a0a] border border-[#2a2a2a] flex items-center justify-center hover:bg-[#1a1a1a] disabled:opacity-50" aria-label="Change profile picture">
