@@ -259,24 +259,23 @@ export function ChatPanel() {
     })
 
     socket.on("message-deleted", (data: { id: string; channelId: string }) => {
-      if (data.channelId !== active) return
+      if (data.channelId !== activeChannelRef.current) return
       setMessages((prev) => prev.map((m) => (m.id === data.id ? { ...m, deleted: true, content: "" } : m)))
     })
 
     socket.on("message-edited", (data: { id: string; channelId: string; content: string; editedAt: string }) => {
-      if (data.channelId !== active) return
+      if (data.channelId !== activeChannelRef.current) return
       setMessages((prev) => prev.map((m) => (m.id === data.id ? { ...m, content: data.content, edited: true } : m)))
     })
 
     socket.on("typing", (data: { channelId: string; userId: string; username: string; isTyping: boolean }) => {
-      if (data.channelId !== active) return
-      setTypingUsers((prev) => {
-        const next = isTyping
+      if (data.channelId !== activeChannelRef.current) return
+      setTypingUsers((prev) =>
+        data.isTyping
           ? [...prev.filter((u) => u.userId !== data.userId), { userId: data.userId, username: data.username }]
-          : prev.filter((u) => u.userId !== data.userId)
-        return next
-      })
-      if (isTyping) {
+          : prev.filter((u) => u.userId !== data.userId),
+      )
+      if (data.isTyping) {
         setTimeout(() => {
           setTypingUsers((prev) => prev.filter((u) => u.userId !== data.userId))
         }, 3000)
@@ -284,7 +283,7 @@ export function ChatPanel() {
     })
 
     socket.on("presence", (data: { channelId: string; users: PresenceUser[] }) => {
-      if (data.channelId === active) setPresence(data.users)
+      if (data.channelId === activeChannelRef.current) setPresence(data.users)
     })
 
     return () => {

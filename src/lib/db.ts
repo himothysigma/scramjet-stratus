@@ -10,15 +10,16 @@ const globalForPrisma = globalThis as unknown as {
 
 function createPrismaClient(): PrismaClient {
   if (isTurso) {
-    // Turso — lazy load adapter
+    // Turso — lazy load adapter so local SQLite never pulls in libsql
     // Using eval to bypass TypeScript ESM restrictions
     const adapterModule = eval('require')('@prisma/adapter-libsql')
-    const libsqlModule = eval('require')('@libsql/client')
-    const libsql = libsqlModule.createClient({
+    // @prisma/adapter-libsql v7 takes a libsql *Config* ({ url, authToken }),
+    // NOT a pre-built libsql Client. Passing a Client leaves url undefined and
+    // every query fails with "URL_INVALID: The URL 'undefined' is not in a valid format".
+    const adapter = new adapterModule.PrismaLibSql({
       url: dbUrl,
       authToken: process.env.DATABASE_AUTH_TOKEN,
     })
-    const adapter = new adapterModule.PrismaLibSql(libsql)
     return new PrismaClient({ adapter, log: isDev ? ['warn', 'error'] : ['error'] })
   }
   // Local SQLite — no adapter needed, just standard Prisma

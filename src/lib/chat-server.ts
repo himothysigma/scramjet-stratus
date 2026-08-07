@@ -111,7 +111,8 @@ export function attachChat(httpServer: HTTPServer): IOServer {
         channelId,
         messages: rows.reverse().map((r) => ({
           id: r.id, channelId: r.channelId, userId: r.userId, username: r.username,
-          content: r.content, deleted: r.deleted, createdAt: r.createdAt,
+          content: r.content, gifUrl: r.gifUrl, deleted: r.deleted,
+          edited: r.edited, editedAt: r.editedAt, createdAt: r.createdAt,
           displayName: r.user?.displayName, pfpUrl: r.user?.pfpUrl,
           pfpIsGif: r.user?.pfpIsGif, role: r.user?.role,
         })),
@@ -125,7 +126,7 @@ export function attachChat(httpServer: HTTPServer): IOServer {
       broadcastPresence(channelId)
     })
 
-    socket.on("send-message", async ({ channelId, content }: { channelId: string; content: string }) => {
+    socket.on("send-message", async ({ channelId, content, gifUrl }: { channelId: string; content: string; gifUrl?: string }) => {
       if (!channelId) return
       // Re-check mute from DB
       const fresh = await db.user.findUnique({ where: { id: user.userId }, select: { muted: true, mutedUntil: true } })
@@ -134,17 +135,52 @@ export function attachChat(httpServer: HTTPServer): IOServer {
         socket.emit("mute-error", { message: "You are muted and can't send messages." })
         return
       }
+
+      const ch = await db.channel.findUnique({ where: { id: channelId } })
+      // Announcement channels: moderators and above only
+      if (ch?.isAnnouncement && !["OWNER", "ADMIN", "MOD"].includes(user.role)) {
+        socket.emit("mute-error", { message: "Only moderators can post in announcement channels." })
+        return
+      }
+      // DM channels: refuse if either side has blocked the other
+      if (ch?.isDM) {
+        const members = await db.membership.findMany({ where: { channelId } })
+        const otherId = members.find((m) => m.userId !== user.userId)?.userId
+        if (otherId) {
+          const blocked = await db.block.findFirst({
+            where: {
+              OR: [
+                { blockerId: otherId, blockedId: user.userId },
+                { blockerId: user.userId, blockedId: otherId },
+              ],
+            },
+          })
+          if (blocked) {
+            socket.emit("mute-error", { message: "You can't message this user." })
+            return
+          }
+        }
+      }
+
       const text = typeof content === "string" ? content.trim() : ""
-      if (text.length === 0 || text.length > 2000) return
+      const gif = typeof gifUrl === "string" && gifUrl.length > 0 ? gifUrl : null
+      if (text.length === 0 && !gif) return
+      if (text.length > 2000) return
 
       const created = await db.message.create({
-        data: { channelId, userId: user.userId, username: user.username, content: text },
+        data: { channelId, userId: user.userId, username: user.username, content: text, gifUrl: gif },
       })
+      // Message count feeds the trusted-user system
+      await db.user.update({
+        where: { id: user.userId },
+        data: { messageCount: { increment: 1 } },
+      }).catch(() => {})
+
       io.to(`channel:${channelId}`).emit("message", {
         id: created.id, channelId: created.channelId, userId: user.userId,
         username: user.username, displayName: user.displayName, pfpUrl: user.pfpUrl,
-        pfpIsGif: user.pfpIsGif, role: user.role, content: text, deleted: false,
-        createdAt: created.createdAt,
+        pfpIsGif: user.pfpIsGif, role: user.role, content: text, gifUrl: gif,
+        deleted: false, edited: false, createdAt: created.createdAt,
       })
     })
 
@@ -152,6 +188,37 @@ export function attachChat(httpServer: HTTPServer): IOServer {
       if (user.role !== "OWNER") return
       await db.message.update({ where: { id: messageId }, data: { deleted: true, content: "" } }).catch(() => {})
       io.to(`channel:${channelId}`).emit("message-deleted", { id: messageId, channelId })
+    })
+
+    // Edit your own message
+    socket.on("edit-message", async ({ messageId, channelId, content }: { messageId: string; channelId: string; content: string }) => {
+      const text = typeof content === "string" ? content.trim() : ""
+      if (text.length === 0 || text.length > 2000) return
+      const msg = await db.message.findUnique({ where: { id: messageId }, select: { userId: true } })
+      if (!msg || msg.userId !== user.userId) return
+      const editedAt = new Date()
+      await db.message.update({ where: { id: messageId }, data: { content: text, edited: true, editedAt } }).catch(() => {})
+      io.to(`channel:${channelId}`).emit("message-edited", {
+        id: messageId, channelId, content: text, editedAt: editedAt.toISOString(),
+      })
+    })
+
+    // Typing indicator — relayed to everyone else in the channel
+    socket.on("typing", ({ channelId, isTyping }: { channelId: string; isTyping: boolean }) => {
+      if (!channelId) return
+      socket.to(`channel:${channelId}`).emit("typing", {
+        channelId, userId: user.userId, username: user.displayName || user.username, isTyping: !!isTyping,
+      })
+    })
+
+    // Rich presence — e.g. "Playing Neon Snake"
+    socket.on("set-presence", ({ activity }: { activity: string }) => {
+      ;(user as ClientUser & { activity?: string }).activity =
+        typeof activity === "string" ? activity.slice(0, 100) : ""
+      online.set(socket.id, user)
+      for (const [channelId, ids] of channelRooms.entries()) {
+        if (ids.has(socket.id)) broadcastPresence(channelId)
+      }
     })
 
     socket.on("disconnect", () => {

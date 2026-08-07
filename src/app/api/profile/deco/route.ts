@@ -3,8 +3,8 @@ import { db } from "@/lib/db"
 import { getCurrentUser, toSafeUser, canUseGifAndDeco } from "@/lib/auth"
 import { AVATAR_DECOS, PROFILE_EFFECTS } from "@/lib/constants"
 
-const VALID_DECOS = AVATAR_DECOS.map((d) => d.id)
-const VALID_EFFECTS = PROFILE_EFFECTS.map((e) => e.id)
+const VALID_DECOS: string[] = AVATAR_DECOS.map((d) => d.id)
+const VALID_EFFECTS: string[] = PROFILE_EFFECTS.map((e) => e.id)
 
 // PATCH /api/profile/deco — set avatar decoration + profile effect (owner only)
 export async function PATCH(req: NextRequest) {

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { getCurrentUser, toSafeUser } from "@/lib/auth"
-import { AVATAR_DECOS, PROFILE_EFFECTS, canUseGifAndDeco } from "@/lib/constants"
 
 // PATCH /api/profile/status — set custom status text
 export async function PATCH(req: NextRequest) {
