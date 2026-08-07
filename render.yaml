@@ -7,7 +7,9 @@ services:
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
-        value: file:./db/custom.db
+        value: libsql://synnical-himothysigma.aws-eu-west-1.turso.io
+      - key: DATABASE_AUTH_TOKEN
+        value: eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODYxMjIyMzIsImlkIjoiMDE5ZmRkMmQtZjMwMS03MTEzLThiMzAtMjZmZTJkNjhmYjcwIiwia2lkIjoia0xXYkVCWFFPMjJiSm9kY24zSVk5UGswMjcweGVtbG51QlphMmc4MWhndyIsInJpZCI6Ijg4MjZmMDE2LTY4ZDctNGE3Ni05NWNmLTdlNjczMmQzYTQxMyJ9.ggE_whZXmvBjV5yKSyPpQe36oFxfEQv1FQ4uFXb2XxMY-NIhwfS0ku_oY8XCWCBzyulOK6tnBi2Ri2q5mNqMBg
       - key: NEXT_PUBLIC_SOCKET_URL
         value: /socket.io
       - key: NODE_ENV
