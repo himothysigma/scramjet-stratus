@@ -1,0 +1,12 @@
+node_modules
+.git
+db/*.db
+db/*.db-wal
+db/*.db-shm
+uploads
+skills
+examples
+tests
+*.log
+dev.log
+chat-service.log

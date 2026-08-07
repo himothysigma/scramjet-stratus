@@ -1,0 +1,14 @@
+run = "bash start.sh"
+hidden = [".config", "package-lock.json", "node_modules", ".next", "db", "uploads", "skills", "examples", "tests"]
+modules = ["nodejs-20"]
+
+[nix]
+channel = "stable-23_11"
+
+[deployment]
+run = ["sh", "-c", "bash start.sh"]
+deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 3000
+externalPort = 80
