@@ -1,27 +1,34 @@
 #!/usr/bin/env bash
-# Stratus start script — works on Replit and any standard host.
-# Runs the Next.js app + socket.io chat on a single port (PORT or 3000)
-# via the custom server (server.ts). No separate chat service needed here.
+# Synnical start script — works on Replit, HF Spaces, Koyeb, Railway, any host.
+# Runs Next.js + socket.io chat on a single port via the custom server (server.ts).
 set -e
 cd "$(dirname "$0")"
 
-# Ensure the SQLite db directory exists
+echo "[synnical] Starting..."
+
+# Ensure directories exist
 mkdir -p db uploads
 
-# Ensure the Prisma client is generated + schema is pushed
+# Generate Prisma client
+echo "[synnical] Generating Prisma client..."
 bunx prisma generate
-bunx prisma db push --accept-data-loss
 
-# Build Next.js for production (uses webpack — custom servers aren't
-# supported with Turbopack, so we don't pass --turbopack).
+# Push schema to database (works with both local SQLite and Turso)
+echo "[synnical] Pushing database schema..."
+bunx prisma db push --accept-data-loss || echo "[synnical] WARNING: db push failed, continuing..."
+
+# Set NEXT_PUBLIC_SOCKET_URL BEFORE build (Next.js bakes public env vars at build time)
+export NEXT_PUBLIC_SOCKET_URL="/socket.io"
+
+# Build Next.js for production
+echo "[synnical] Building Next.js..."
 bun run build
 
-# Hand off to the custom server (Next.js + socket.io on one port).
-# NODE_ENV=production so Next serves the built app.
+# Start the custom server (Next.js + socket.io on one port)
+# HF Spaces uses port 7860, others use PORT env var or default 3000
 export NODE_ENV=production
 export PORT=${PORT:-3000}
 export HOSTNAME=0.0.0.0
-# Tell the frontend to connect to socket.io on the SAME origin (custom server).
-export NEXT_PUBLIC_SOCKET_URL="/socket.io"
 
+echo "[synnical] Launching on port $PORT..."
 exec bun server.ts

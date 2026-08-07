@@ -1,13 +1,12 @@
-// Stratus custom server — runs Next.js + the socket.io chat on ONE port.
-// Used on Replit / standard Node hosts where only a single port is exposed.
-// (In the sandbox dev environment we use `next dev` + the separate
-// mini-services/chat-service instead.)
+// Synnical custom server — runs Next.js + socket.io chat on ONE port.
+// Works on Replit (PORT=3000), HF Spaces (PORT=7860), Koyeb, Railway, etc.
 import { createServer } from "http"
 import next from "next"
 import { attachChat } from "./src/lib/chat-server"
 
 const dev = process.env.NODE_ENV !== "production"
 const hostname = process.env.HOSTNAME || "0.0.0.0"
+// HF Spaces uses port 7860, others use PORT or default 3000
 const port = Number(process.env.PORT) || 3000
 
 async function main() {
@@ -19,7 +18,7 @@ async function main() {
   attachChat(httpServer)
 
   httpServer.listen(port, hostname, () => {
-    console.log(`> Stratus ready on http://${hostname}:${port} (dev=${dev})`)
+    console.log(`> Synnical ready on http://${hostname}:${port} (dev=${dev})`)
   })
 }
 
