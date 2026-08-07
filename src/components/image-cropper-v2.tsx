@@ -68,7 +68,19 @@ export function ImageCropperV2({
   }, [open, aspect])
 
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    setImgEl(e.currentTarget)
+    const img = e.currentTarget
+    setImgEl(img)
+    // Set initial completed crop from the percentage-based crop
+    // so the "Crop & Save" button works without needing to drag first
+    if (crop && img.width && img.height) {
+      setCompleted({
+        unit: "px",
+        x: (crop.x / 100) * img.width,
+        y: (crop.y / 100) * img.height,
+        width: (crop.width / 100) * img.width,
+        height: (crop.height / 100) * img.height,
+      })
+    }
   }
 
   const reset = () => {

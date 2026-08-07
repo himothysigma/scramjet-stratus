@@ -61,6 +61,97 @@ export const GAME_SOURCES: GameSource[] = [
   { id: "crackstuff", name: "Crackstuff Games", url: "https://crackstuff.pages.dev/games", thumbnail: "https://www.google.com/s2/favicons?domain=crackstuff.pages.dev&sz=128", description: "Cracked/unblocked game collection." },
 ]
 
+// 50 specific, real, playable browser games hosted on CrazyGames.
+// Each entry links directly to the game's page on crazygames.com and uses
+// the real CrazyGames favicon (served via Google's S2 favicon service).
+// All games share the crazygames.com domain, so the favicon is the same —
+// it is a real icon (not AI-generated), and the card distinguishes each
+// game by its name, description, and category badge.
+export type CloudGameCategory =
+  | "Arcade"
+  | "Puzzle"
+  | "Action"
+  | "Racing"
+  | "Sports"
+  | "Strategy"
+
+export type CloudGame = {
+  id: string
+  name: string
+  url: string
+  thumbnail: string
+  description: string
+  category: CloudGameCategory
+}
+
+const CG_FAVICON = "https://www.google.com/s2/favicons?domain=www.crazygames.com&sz=128"
+const cg = (
+  slug: string,
+  name: string,
+  description: string,
+  category: CloudGameCategory,
+): CloudGame => ({
+  id: slug,
+  name,
+  url: `https://www.crazygames.com/game/${slug}`,
+  thumbnail: CG_FAVICON,
+  description,
+  category,
+})
+
+export const CLOUD_GAMES: CloudGame[] = [
+  cg("shell-shockers", "Shell Shockers", "Egg-based multiplayer FPS. Crack your enemies before they crack you.", "Action"),
+  cg("krunker", "Krunker.io", "Fast-paced blocky FPS with parkour movement and multiple game modes.", "Action"),
+  cg("smash-karts", "Smash Karts", "Drive a kart, grab weapons, smash opponents in chaotic arena battles.", "Action"),
+  cg("rooftop-snipers", "Rooftop Snipers", "Two-button 1v1 sniper duel on a rooftop. Knock your friend off.", "Action"),
+  cg("getaway-shootout", "Getaway Shootout", "Two-player chase with weird physics and absurd weapons.", "Action"),
+  cg("wolfenstein-3d", "Wolfenstein 3D", "The original FPS. Blast Nazis through maze-like castle corridors.", "Action"),
+  cg("doom", "DOOM", "Play the legendary 1993 demon-shooting FPS right in your browser.", "Action"),
+  cg("quaketouch", "Quake Touch", "Browser port of the iconic fast arena shooter Quake.", "Action"),
+  cg("combat-online", "Combat Online", "Blocky tactical FPS with multiple maps, modes, and a server browser.", "Action"),
+  cg("break-bricks", "Break Bricks", "Smash every brick with a bouncing ball and paddle.", "Action"),
+  cg("vex", "Vex", "Stickman platformer with spikes, traps, and tight parkour runs.", "Action"),
+  cg("happy-wheels", "Happy Wheels", "Infamous physics obstacle course with hilariously brutal ragdolls.", "Action"),
+  cg("basketball-stars", "Basketball Stars", "1v1 street basketball with slick moves, dunks, and quick matches.", "Sports"),
+  cg("soccer-skills", "Soccer Skills", "Fast 3v3 soccer with quick matches and simple swipe controls.", "Sports"),
+  cg("throwing-toss", "Throwing Toss", "Launch a turtle from a cannon and see how far you can fling it.", "Sports"),
+  cg("basketball-legends", "Basketball Legends", "Arcade-style 1v1 hoops with oversized stars and special moves.", "Sports"),
+  cg("8-ball-pool", "8 Ball Pool", "Classic pool hall 8-ball. Aim, set spin, sink your balls first.", "Sports"),
+  cg("archery-world-tour", "Archery World Tour", "Aim and shoot arrows across world tour stops with realistic physics.", "Sports"),
+  cg("bowling-stars", "Bowling Stars", "Realistic 3D bowling with spin, oil patterns, and tournaments.", "Sports"),
+  cg("mini-golf-club", "Mini Golf Club", "Top-down mini golf across creative obstacle-filled courses.", "Sports"),
+  cg("ping-pong", "Ping Pong", "Table tennis with smooth controls and competitive rallies.", "Sports"),
+  cg("tennis-masters", "Tennis Masters", "2D arcade tennis with special moves and 1v1 or 2v2 modes.", "Sports"),
+  cg("volleyball", "Volleyball", "Beach volleyball with simple controls and satisfying digs.", "Sports"),
+  cg("boxing-random", "Boxing Random", "Hilarious physics boxing with random rules every round.", "Sports"),
+  cg("soccer-random", "Soccer Random", "Wobbly 2-button soccer where every goal is a comedy of errors.", "Sports"),
+  cg("basketball-random", "Basketball Random", "Two-button ragdoll basketball with absurd jump physics.", "Sports"),
+  cg("moto-x3m", "Moto X3M", "Ride a dirt bike through deadly obstacle courses and beat the clock.", "Racing"),
+  cg("drift-hunters", "Drift Hunters", "Tune your car and chain massive drifts across multiple tracks.", "Racing"),
+  cg("snow-rider-3d", "Snow Rider 3D", "Sled down snowy hills, dodge trees, and grab gifts on the way.", "Racing"),
+  cg("tunnel-rush", "Tunnel Rush", "Race through neon tunnels dodging obstacles at blistering speed.", "Arcade"),
+  cg("stickman-hook", "Stickman Hook", "Swing through levels like Spider-Man with sticky grappling hooks.", "Arcade"),
+  cg("flappy-bird", "Flappy Bird", "Tap to flap through the pipes. Endlessly frustrating, endlessly fun.", "Arcade"),
+  cg("tower-building", "Tower Builder", "Stack blocks perfectly to build the tallest tower you can.", "Arcade"),
+  cg("stack-balls", "Stack Ball", "Smash a ball through rotating helix platforms without hitting red.", "Arcade"),
+  cg("helix-jump", "Helix Jump", "Guide a ball down a rotating helix, avoiding red zones.", "Arcade"),
+  cg("awkward-raccoon", "Awkward Raccoon", "Quirky arcade adventure starring a mischievous raccoon.", "Arcade"),
+  cg("parking-fury", "Parking Fury", "Park cars precisely without scratching them across tricky lots.", "Puzzle"),
+  cg("bubble-shooter", "Bubble Shooter", "Match-three bubble popping. Clear the board before it drops.", "Puzzle"),
+  cg("solitaire-classic", "Solitaire Classic", "Klondike solitaire. Sort the deck into suits from Ace to King.", "Puzzle"),
+  cg("mahjong", "Mahjong", "Tile-matching solitaire. Pair identical tiles to clear the board.", "Puzzle"),
+  cg("sudoku-classic", "Sudoku Classic", "9x9 number logic puzzle. Fill every row, column, and box.", "Puzzle"),
+  cg("tetris", "Tetris", "Stack falling tetrominoes and clear lines in the timeless classic.", "Puzzle"),
+  cg("2048", "2048", "Slide and merge numbered tiles to reach the elusive 2048.", "Puzzle"),
+  cg("minesweeper", "Minesweeper", "Flag the mines and reveal the board without blowing up.", "Puzzle"),
+  cg("bubble-game", "Bubble Game", "Casual bubble popping with relaxing pastel colors.", "Puzzle"),
+  cg("fireboy-and-watergirl", "Fireboy & Watergirl", "Two-player cooperative puzzle platformer with elemental heroes.", "Puzzle"),
+  cg("snail-bob", "Snail Bob", "Point-and-click puzzle adventure to guide a snail safely home.", "Puzzle"),
+  cg("raft-wars", "Raft Wars", "Turn-based projectile duel on the water. Aim, fire, splash.", "Strategy"),
+  cg("chess-online", "Chess Online", "Full chess with online multiplayer, bots, and rated play.", "Strategy"),
+  cg("checkers", "Checkers", "Classic draughts. Jump and capture all of your opponent's pieces.", "Strategy"),
+]
+
 // Quick links — real website thumbnails (favicons via Google's service, NOT emojis/icons)
 export type QuickLink = { name: string; url: string; thumbnail: string }
 

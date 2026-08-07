@@ -477,6 +477,12 @@ export function ProfileEffectLayer({ effect }: { effect: string | null | undefin
     snow: { emoji: "❄️", count: 25, duration: [5, 12] },
     bubbles: { emoji: "○", count: 18, duration: [4, 8] },
     fireflies: { emoji: "🟡", count: 15, duration: [6, 10] },
+    lightning: { emoji: "⚡", count: 12, duration: [3, 6] },
+    hearts: { emoji: "❤", count: 18, duration: [4, 8] },
+    leaves: { emoji: "🍃", count: 15, duration: [5, 10] },
+    butterflies: { emoji: "🦋", count: 10, duration: [6, 12] },
+    rain: { emoji: "│", count: 30, duration: [2, 5] },
+    embers: { emoji: "↑", count: 20, duration: [3, 7] },
   }
   const cfg = configs[effect]
   if (!cfg) return null

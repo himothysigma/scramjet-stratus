@@ -30,6 +30,16 @@ export const AVATAR_DECOS = [
   { id: "ice-crystals", name: "Ice Crystals" },
   { id: "rainbow-ring", name: "Rainbow Ring" },
   { id: "royal-frame", name: "Royal Frame" },
+  { id: "lightning-ring", name: "Lightning Ring" },
+  { id: "rose-petals", name: "Rose Petals" },
+  { id: "galaxy-swirl", name: "Galaxy Swirl" },
+  { id: "golden-laurel", name: "Golden Laurel" },
+  { id: "neon-grid", name: "Neon Grid" },
+  { id: "bubble-frame", name: "Bubble Frame" },
+  { id: "shadow-aura", name: "Shadow Aura" },
+  { id: "candy-stripes", name: "Candy Stripes" },
+  { id: "cyber-circuit", name: "Cyber Circuit" },
+  { id: "angel-wings", name: "Angel Wings" },
 ] as const
 
 // Auto-punishment thresholds (configurable)
@@ -54,4 +64,24 @@ export const PROFILE_EFFECTS = [
   { id: "snow", name: "Snow" },
   { id: "bubbles", name: "Bubbles" },
   { id: "fireflies", name: "Fireflies" },
+  { id: "lightning", name: "Lightning" },
+  { id: "hearts", name: "Floating Hearts" },
+  { id: "leaves", name: "Falling Leaves" },
+  { id: "butterflies", name: "Butterflies" },
+  { id: "rain", name: "Rain" },
+  { id: "embers", name: "Rising Embers" },
+] as const
+
+// Additional avatar decorations (10 more)
+export const AVATAR_DECOS_EXTRA = [
+  { id: "lightning-ring", name: "Lightning Ring" },
+  { id: "rose-petals", name: "Rose Petals" },
+  { id: "galaxy-swirl", name: "Galaxy Swirl" },
+  { id: "golden-laurel", name: "Golden Laurel" },
+  { id: "neon-grid", name: "Neon Grid" },
+  { id: "bubble-frame", name: "Bubble Frame" },
+  { id: "shadow-aura", name: "Shadow Aura" },
+  { id: "candy-stripes", name: "Candy Stripes" },
+  { id: "cyber-circuit", name: "Cyber Circuit" },
+  { id: "angel-wings", name: "Angel Wings" },
 ] as const
