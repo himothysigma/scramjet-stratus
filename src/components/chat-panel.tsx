@@ -671,7 +671,7 @@ export function ChatPanel() {
                       {u.muted ? (
                         <DropdownMenuItem onClick={() => unmuteUser(u)}><Volume2 className="h-3.5 w-3.5 mr-2" />Unmute</DropdownMenuItem>
                       ) : (
-                        <DropdownMenuItem onClick={() => muteUser(u)} className="text-destructive"><VolumeX className="h-3.5 w-3.5 mr-2" />Mute</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => muteUser(u)} className="text-[#ef4444]"><VolumeX className="h-3.5 w-3.5 mr-2" />Mute</DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -806,7 +806,7 @@ function MessageRow({
               <button
                 type="button"
                 onClick={() => onDelete(m)}
-                className="text-[#888888] hover:text-destructive p-1"
+                className="text-[#888888] hover:text-[#ef4444] p-1"
                 aria-label="Delete message"
                 title="Delete"
               >

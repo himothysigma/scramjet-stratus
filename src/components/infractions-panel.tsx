@@ -391,7 +391,7 @@ export function InfractionsPanel() {
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                className="h-7 w-7 p-0 text-[#ef4444] hover:text-[#ef4444] hover:bg-[#ef4444]/10"
                                 onClick={() => onDelete(inf.id)}
                                 disabled={deletingId === inf.id}
                                 aria-label="Delete infraction"

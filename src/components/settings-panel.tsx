@@ -134,7 +134,7 @@ export function SettingsPanel() {
                       </SelectContent>
                     </Select>
                     <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => toggleMute(u)} aria-label={u.muted ? "Unmute" : "Mute"}>
-                      {u.muted ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5 text-destructive" />}
+                      {u.muted ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5 text-[#ef4444]" />}
                     </Button>
                   </div>
                 ))}
@@ -146,7 +146,7 @@ export function SettingsPanel() {
         {/* Session */}
         <section className="rounded-xl border border-[#2a2a2a] p-4">
           <h2 className="text-sm font-semibold mb-3">Session</h2>
-          <Button variant="outline" onClick={onLogout} disabled={loggingOut} className="gap-2 text-destructive hover:text-destructive">
+          <Button variant="outline" onClick={onLogout} disabled={loggingOut} className="gap-2 text-[#ef4444] hover:text-[#ef4444]">
             {loggingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}Log out
           </Button>
           <p className="text-xs text-[#888888] mt-2">You stay logged in across visits until you log out manually.</p>

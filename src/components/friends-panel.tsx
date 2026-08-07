@@ -157,7 +157,7 @@ export function FriendsPanel() {
                       </div>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100">
                         <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => openDM(u)} aria-label="Message"><MessageSquare className="h-3.5 w-3.5" /></Button>
-                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive" onClick={() => removeFriend(u.id)} aria-label="Remove friend"><X className="h-3.5 w-3.5" /></Button>
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-[#ef4444]" onClick={() => removeFriend(u.id)} aria-label="Remove friend"><X className="h-3.5 w-3.5" /></Button>
                       </div>
                     </div>
                   ))}
