@@ -8,23 +8,20 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-// For local SQLite (default), create client synchronously
-// For Turso, create client with adapter (also synchronous — packages are installed)
 function createPrismaClient(): PrismaClient {
   if (isTurso) {
-    // Turso (libSQL) — cloud SQLite for production persistence
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { PrismaLibSql } = require('@prisma/adapter-libsql')
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { createClient } = require('@libsql/client')
-    const libsql = createClient({
+    // Turso — lazy load adapter
+    // Using eval to bypass TypeScript ESM restrictions
+    const adapterModule = eval('require')('@prisma/adapter-libsql')
+    const libsqlModule = eval('require')('@libsql/client')
+    const libsql = libsqlModule.createClient({
       url: dbUrl,
       authToken: process.env.DATABASE_AUTH_TOKEN,
     })
-    const adapter = new PrismaLibSql(libsql)
+    const adapter = new adapterModule.PrismaLibSql(libsql)
     return new PrismaClient({ adapter, log: isDev ? ['warn', 'error'] : ['error'] })
   }
-  // Local SQLite (sandbox/dev/Render without Turso)
+  // Local SQLite — no adapter needed, just standard Prisma
   return new PrismaClient({ log: isDev ? ['warn', 'error'] : ['error'] })
 }
 

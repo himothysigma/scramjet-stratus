@@ -12,10 +12,12 @@ export async function POST(req: NextRequest) {
     if (!user || !verifyPassword(password, user.passwordHash)) {
       return NextResponse.json({ error: "Wrong username or password" }, { status: 401 })
     }
-    // No auto-owner on login. Owner only via Settings verify.
     await createSession(user.id)
     return NextResponse.json({ user: toSafeUser(user) })
   } catch (e) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 })
+    const msg = e instanceof Error ? e.message : String(e)
+    const stack = e instanceof Error ? e.stack : ""
+    console.error("[login] Error:", msg, stack)
+    return NextResponse.json({ error: msg, stack: stack?.slice(0, 500) }, { status: 500 })
   }
 }
