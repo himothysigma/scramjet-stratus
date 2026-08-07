@@ -177,7 +177,24 @@ export function CloudGamingPanel() {
         className="group relative text-left rounded-xl border border-[#2a2a2a] bg-[#121212] hover:border-pink-500/40 hover:shadow-lg transition-all overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/50"
       >
         <div className="aspect-[16/10] relative overflow-hidden bg-[#1a1a1a]">
-          <img src={g.cover} alt={`${g.name} cover`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+          {g.cover ? (
+            <img src={g.cover} alt={`${g.name} cover`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
+              style={{
+                background: `linear-gradient(135deg, ${g.accent}33, #1a1a1a 60%, ${g.accent}1a)`,
+              }}
+            >
+              <span
+                className="text-5xl font-black select-none"
+                style={{ color: g.accent, textShadow: `0 0 24px ${g.accent}66` }}
+                aria-hidden
+              >
+                {g.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
           {/* Favorite star — top-left, over the cover image */}
           <button
             type="button"

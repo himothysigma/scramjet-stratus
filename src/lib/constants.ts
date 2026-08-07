@@ -16,6 +16,8 @@ export type Role = "OWNER" | "ADMIN" | "MOD" | "MEMBER"
 export const ROLES: Role[] = ["OWNER", "ADMIN", "MOD", "MEMBER"]
 
 // Avatar decorations (owner-only) — id → label
+// Each non-"none" id maps to a real SVG overlay rendered by AvatarDecoOverlay
+// in src/components/role-ui.tsx.
 export const AVATAR_DECOS = [
   { id: "none", name: "None" },
   { id: "neon-ring", name: "Neon Ring" },
@@ -23,6 +25,11 @@ export const AVATAR_DECOS = [
   { id: "pixel-border", name: "Pixel Border" },
   { id: "glow-aura", name: "Glow Aura" },
   { id: "star-frame", name: "Star Frame" },
+  { id: "diamond-ring", name: "Diamond Ring" },
+  { id: "fire-border", name: "Fire Border" },
+  { id: "ice-crystals", name: "Ice Crystals" },
+  { id: "rainbow-ring", name: "Rainbow Ring" },
+  { id: "royal-frame", name: "Royal Frame" },
 ] as const
 
 // Auto-punishment thresholds (configurable)

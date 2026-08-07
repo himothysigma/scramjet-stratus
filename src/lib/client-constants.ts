@@ -20,6 +20,10 @@ export const GAMES: GameDef[] = [
   { id: "minesweeper", name: "Minesweeper Grid", description: "Find every mine without blowing up. Flag and reveal.", url: "/games/minesweeper.html", cover: "/games/covers/minesweeper.png", category: "Puzzle", controls: "Click / Right-click / Long-press", accent: "#f43f5e" },
   { id: "memory", name: "Memory Match", description: "Flip cards, match pairs, beat your best move count.", url: "/games/memory.html", cover: "/games/covers/memory.png", category: "Puzzle", controls: "Click / Tap", accent: "#eab308" },
   { id: "invaders", name: "Void Invaders", description: "Shoot the alien fleet. Survive 6 waves. Don't get hit.", url: "/games/invaders.html", cover: "/games/covers/invaders.png", category: "Action", controls: "Arrows / A-D / Space", accent: "#a855f7" },
+  { id: "flappy", name: "Flappy Pink", description: "Tap to flap, dodge the pipes. How far can you fly?", url: "/games/flappy.html", cover: "", category: "Arcade", controls: "Click / Space / Tap", accent: "#ec4899" },
+  { id: "tictactoe", name: "Tic Tac Toe", description: "Classic 3x3 vs smart AI. Get three in a row to win.", url: "/games/tictactoe.html", cover: "", category: "Puzzle", controls: "Click / Tap", accent: "#ec4899" },
+  { id: "chess", name: "Mini Chess", description: "Two-player chess on a full 8x8 board. Basic rules.", url: "/games/chess.html", cover: "", category: "Puzzle", controls: "Click to move", accent: "#ec4899" },
+  { id: "sudoku", name: "Mini Sudoku", description: "Relaxing 4x4 sudoku. Fill every row, column and box.", url: "/games/sudoku.html", cover: "", category: "Puzzle", controls: "Click / Tap", accent: "#ec4899" },
 ]
 
 // Regions — text codes, no flag emojis

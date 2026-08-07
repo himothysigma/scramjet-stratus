@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { AlertTriangle, Lock, ExternalLink, Eye, EyeOff } from "lucide-react"
+import { AlertTriangle, Lock, ExternalLink, Eye, EyeOff, ArrowLeft, Maximize2, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 const ADULT_PASSWORD = "Samseunlore+2711"
@@ -26,8 +26,9 @@ export function AdultPanel() {
   const [verified, setVerified] = useState(false)
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [activeUrl, setActiveUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  // Check if already verified on mount
   useEffect(() => {
     if (typeof window !== "undefined" && localStorage.getItem(ADULT_KEY) === ADULT_PASSWORD) {
       /* eslint-disable react-hooks/set-state-in-effect */
@@ -39,10 +40,47 @@ export function AdultPanel() {
     if (password === ADULT_PASSWORD) {
       localStorage.setItem(ADULT_KEY, ADULT_PASSWORD)
       setVerified(true)
-      toast.success("Access granted — welcome to the 18+ section")
+      toast.success("Access granted")
     } else {
       toast.error("Incorrect password")
     }
+  }
+
+  // If viewing a specific site, show it in an iframe (inside Synnical, not new tab)
+  if (verified && activeUrl) {
+    return (
+      <div className="h-full flex flex-col bg-[#0a0a0a]">
+        <div className="h-11 shrink-0 px-3 flex items-center justify-between border-b border-[#2a2a2a]">
+          <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setActiveUrl(null)}>
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Button>
+          <span className="text-sm font-medium truncate">{activeUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}</span>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+            const el = document.querySelector('iframe')
+            if (el) { document.fullscreenElement ? document.exitFullscreen() : el.requestFullscreen?.() }
+          }} aria-label="Fullscreen">
+            <Maximize2 className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="flex-1 relative bg-[#0a0a0a]">
+          {loading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+              <Loader2 className="h-6 w-6 animate-spin text-red-500" />
+              <p className="text-sm text-[#888888]">Loading… if blank, the site blocks embedding.</p>
+            </div>
+          )}
+          <iframe
+            src={activeUrl}
+            title="Adult content"
+            className="w-full h-full"
+            style={{ border: "none" }}
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+            referrerPolicy="no-referrer"
+            onLoad={() => setLoading(false)}
+          />
+        </div>
+      </div>
+    )
   }
 
   if (!verified) {
@@ -103,35 +141,33 @@ export function AdultPanel() {
           </div>
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-[#f0f0f0]">18+ Adult</h1>
-            <p className="text-sm text-[#888888]">Password-verified adult content</p>
+            <p className="text-sm text-[#888888]">Password-verified — opens inside Synnical</p>
           </div>
         </div>
 
         <div className="mt-4 mb-5 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] p-3">
           <p className="text-xs text-[#888888]">
             <AlertTriangle className="h-3 w-3 inline mr-1 text-red-500" />
-            Verified. Content is provided by third-party sites — Synnical is not affiliated.
-            To remove access, clear your browser data.
+            Verified. Click a site to open it inside Synnical. Some sites may block embedding — if blank, use the external link button.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {ADULT_LINKS.map((link) => (
-            <a
-              key={link.name}
-              href={link.url}
-              target="_blank"
-              rel="noreferrer"
-              className="group flex items-center gap-3 p-4 rounded-xl border border-[#2a2a2a] bg-[#121212] hover:border-red-500/40 hover:bg-[#1a1a1a] transition-all"
-            >
-              <div className="h-10 w-10 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
-                <ExternalLink className="h-4 w-4 text-red-500" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-sm text-[#f0f0f0] truncate">{link.name}</p>
-                <p className="text-[10px] text-[#888888]">{link.category}</p>
-              </div>
-            </a>
+            <div key={link.name} className="flex items-center gap-3 p-4 rounded-xl border border-[#2a2a2a] bg-[#121212] hover:border-red-500/40 hover:bg-[#1a1a1a] transition-all">
+              <button
+                onClick={() => { setActiveUrl(link.url); setLoading(true) }}
+                className="flex items-center gap-3 flex-1 text-left"
+              >
+                <div className="h-10 w-10 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
+                  <ExternalLink className="h-4 w-4 text-red-500" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm text-[#f0f0f0] truncate">{link.name}</p>
+                  <p className="text-[10px] text-[#888888]">{link.category}</p>
+                </div>
+              </button>
+            </div>
           ))}
         </div>
 

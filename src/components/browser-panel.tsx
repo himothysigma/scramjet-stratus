@@ -165,20 +165,24 @@ export function BrowserPanel() {
           <PopoverTrigger asChild>
             <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-xs">
               <Search className="h-3.5 w-3.5" />
-              {searchEngine(searchEngineId).icon} {searchEngine(searchEngineId).name}
+              {searchEngine(searchEngineId).name}
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-48 p-1">
-            {SEARCH_ENGINES.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setSearchEngine(s.id)}
-                className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-[#1a1a1a]"
-              >
-                <span>{s.icon}</span><span className="flex-1 text-left">{s.name}</span>
-                {searchEngineId === s.id && <span className="synnical-accent">✓</span>}
-              </button>
-            ))}
+            {SEARCH_ENGINES.map((s) => {
+              const SIcon = s.icon
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setSearchEngine(s.id)}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-[#1a1a1a]"
+                >
+                  <SIcon className="h-3.5 w-3.5" />
+                  <span className="flex-1 text-left">{s.name}</span>
+                  {searchEngineId === s.id && <Check className="h-3.5 w-3.5 synnical-accent" />}
+                </button>
+              )
+            })}
           </PopoverContent>
         </Popover>
         {/* Proxy toggle */}
