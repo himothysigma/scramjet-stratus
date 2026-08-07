@@ -1,23 +1,15 @@
-# Synnical Dockerfile — works on HF Spaces, Koyeb, Railway, Fly.io, any Docker host
-# HF Spaces requires port 7860. Other hosts use PORT env var.
+# Synnical Dockerfile — works on Render, Koyeb, Railway, Fly.io, any Docker host
+# Uses Node.js for build (Bun can't run Next.js Turbopack), Bun for runtime
 
-FROM oven/bun:1.1 AS base
+FROM node:20-slim AS builder
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
 # Copy package files
-COPY package.json bun.lock ./
+COPY package.json bun.lock* package-lock.json* ./
 COPY prisma ./prisma
 
-# Install dependencies
-RUN bun install
+# Install dependencies with npm (works in all environments)
+RUN npm install
 
 # Copy source
 COPY . .
@@ -26,16 +18,29 @@ COPY . .
 ENV NEXT_PUBLIC_SOCKET_URL=/socket.io
 ENV NODE_ENV=production
 
-# Generate Prisma client + push schema
-RUN bunx prisma generate
-RUN bunx prisma db push --accept-data-loss || true
+# Generate Prisma client + push schema (local SQLite for build, Turso at runtime)
+RUN npx prisma generate
+RUN npx prisma db push --accept-data-loss || true
 
-# Build Next.js
-RUN bun run build
+# Build Next.js with Node.js (NOT Bun — Bun can't run Turbopack worker_threads)
+RUN npx next build
 
-# Expose port (7860 for HF Spaces, 3000 for others)
-EXPOSE 7860
+# ---- Runtime stage ----
+FROM node:20-slim AS runner
+WORKDIR /app
+
+# Copy built app + dependencies
+COPY --from=builder /app ./
+
+# Set environment
+ENV NODE_ENV=production
+ENV NEXT_PUBLIC_SOCKET_URL=/socket.io
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
+# Expose port (Render uses PORT env, others can set it)
+EXPOSE 3000
 
 # Start the custom server (Next.js + Socket.IO on one port)
-# Uses PORT env var (HF Spaces sets PORT=7860, others can set PORT=3000)
-CMD ["sh", "-c", "PORT=${PORT:-7860} bun server.ts"]
+# Uses Node.js (not Bun) for maximum compatibility
+CMD ["npx", "tsx", "server.ts"]

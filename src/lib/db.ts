@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaLibSQL } from '@prisma/adapter-libsql'
+import { PrismaLibSql } from '@prisma/adapter-libsql'
 import { createClient } from '@libsql/client'
 
 const isDev = process.env.NODE_ENV !== 'production'
@@ -17,7 +17,7 @@ function createPrismaClient(): PrismaClient {
       url: dbUrl,
       authToken: process.env.DATABASE_AUTH_TOKEN,
     })
-    const adapter = new PrismaLibSQL(libsql)
+    const adapter = new PrismaLibSql(libsql)
     return new PrismaClient({ adapter, log: isDev ? ['warn', 'error'] : ['error'] })
   }
   // Local SQLite (sandbox/dev)
