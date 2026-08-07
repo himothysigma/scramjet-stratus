@@ -1,5 +1,4 @@
 node_modules
-.next
 .git
 db/*.db
 db/*.db-wal
@@ -11,4 +10,3 @@ tests
 *.log
 dev.log
 chat-service.log
-.env
